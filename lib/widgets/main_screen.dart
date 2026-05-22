@@ -4,13 +4,15 @@ import '../viewmodels/barcode_viewmodel.dart';
 import 'scanner_tab.dart';
 import 'history_tab.dart';
 import 'companion_tab.dart';
-import 'settings_tab.dart';
+import 'about_tab.dart';
+import 'settings_screen.dart';
+
 
 enum AppTab {
   scanner('Scanner', Icons.qr_code_scanner_outlined, Icons.qr_code_scanner),
   history('History', Icons.history_outlined, Icons.history),
   companion('Companion', Icons.laptop_outlined, Icons.laptop),
-  settings('Settings', Icons.settings_outlined, Icons.settings);
+  about('About', Icons.info_outline, Icons.info);
 
   final String title;
   final IconData iconUnselected;
@@ -116,9 +118,11 @@ class _MainScreenState extends State<MainScreen> {
                         minimumSize: const Size(40.0, 40.0),
                       ),
                       onPressed: () {
-                        setState(() {
-                          _selectedTab = AppTab.settings;
-                        });
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => SettingsScreen(viewModel: _viewModel),
+                          ),
+                        );
                       },
                     ),
                   ],
@@ -132,7 +136,7 @@ class _MainScreenState extends State<MainScreen> {
               ScannerTab(viewModel: _viewModel),
               HistoryTab(viewModel: _viewModel),
               CompanionTab(),
-              SettingsTab(viewModel: _viewModel),
+              const AboutTab(),
             ],
           ),
           bottomNavigationBar: Container(

@@ -80,13 +80,14 @@ class _ScannerTabState extends State<ScannerTab> with SingleTickerProviderStateM
               clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(32.0),
-                border: Border.all(color: polishPrimaryContainer, width: 4.0),
               ),
               child: Stack(
+                fit: StackFit.expand,
                 children: [
                   // Camera preview
                   MobileScanner(
                     controller: _cameraController,
+                    fit: BoxFit.cover,
                     onDetect: (capture) {
                       if (!viewModel.isCoolingDown) {
                         for (final barcode in capture.barcodes) {
@@ -119,6 +120,16 @@ class _ScannerTabState extends State<ScannerTab> with SingleTickerProviderStateM
                     },
                   ),
 
+                  // Inner border overlay (draws stroke strictly inside to avoid layout gaps, on top of viewfinder overlay to prevent dimming)
+                  IgnorePointer(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(32.0),
+                        border: Border.all(color: polishPrimaryContainer, width: 8.0),
+                      ),
+                    ),
+                  ),
+
                   // Connection active badge in top-right
                   Positioned(
                     top: 16.0,
@@ -140,6 +151,32 @@ class _ScannerTabState extends State<ScannerTab> with SingleTickerProviderStateM
                           ),
                         ],
                       ),
+                    ),
+                  ),
+
+                  // Flash toggle button in top-left
+                  Positioned(
+                    top: 16.0,
+                    left: 16.0,
+                    child: ValueListenableBuilder<MobileScannerState>(
+                      valueListenable: _cameraController,
+                      builder: (context, state, child) {
+                        final isTorchOn = state.torchState == TorchState.on;
+                        return IconButton(
+                          icon: Icon(
+                            isTorchOn ? Icons.flash_on : Icons.flash_off,
+                            color: isTorchOn ? Colors.yellow : Colors.white,
+                            size: 20.0,
+                          ),
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.black.withOpacity(0.4),
+                            shape: const CircleBorder(),
+                            side: BorderSide(color: Colors.white.withOpacity(0.15), width: 1.0),
+                            minimumSize: const Size(40.0, 40.0),
+                          ),
+                          onPressed: () => _cameraController.toggleTorch(),
+                        );
+                      },
                     ),
                   ),
 

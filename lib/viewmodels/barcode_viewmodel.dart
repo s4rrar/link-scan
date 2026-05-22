@@ -17,7 +17,7 @@ class BarcodeViewModel extends ChangeNotifier {
   int _serverPort = 8080;
   int get serverPort => _serverPort;
 
-  double _scanDelayMs = 2000.0;
+  double _scanDelayMs = 500.0;
   double get scanDelayMs => _scanDelayMs;
 
   bool _soundEnabled = true;
@@ -63,7 +63,7 @@ class BarcodeViewModel extends ChangeNotifier {
     _prefs = await SharedPreferences.getInstance();
     _serverIp = _prefs.getString('server_ip') ?? '192.168.1.100';
     _serverPort = _prefs.getInt('server_port') ?? 8080;
-    _scanDelayMs = _prefs.getDouble('scan_delay_ms') ?? 2000.0;
+    _scanDelayMs = _prefs.getDouble('scan_delay_ms') ?? 500.0;
     _soundEnabled = _prefs.getBool('sound_enabled') ?? true;
     _vibrationEnabled = _prefs.getBool('vibration_enabled') ?? true;
 

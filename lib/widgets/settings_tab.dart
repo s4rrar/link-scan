@@ -340,7 +340,7 @@ class _SettingsTabState extends State<SettingsTab> {
                     Switch(
                       value: viewModel.soundEnabled,
                       activeTrackColor: polishPrimary,
-                      activeColor: Colors.white,
+                      activeThumbColor: Colors.white,
                       onChanged: (newValue) {
                         viewModel.updateSoundEnabled(newValue);
                       },
@@ -386,7 +386,7 @@ class _SettingsTabState extends State<SettingsTab> {
                     Switch(
                       value: viewModel.vibrationEnabled,
                       activeTrackColor: polishPrimary,
-                      activeColor: Colors.white,
+                      activeThumbColor: Colors.white,
                       onChanged: (newValue) {
                         viewModel.updateVibrationEnabled(newValue);
                       },
