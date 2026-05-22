@@ -182,7 +182,7 @@ class AboutTab extends StatelessWidget {
                   onTap: () {
                     Clipboard.setData(
                       const ClipboardData(
-                        text: 'https://github.com/s4rrar/wifi-barcode-scanner',
+                        text: 'https://github.com/s4rrar/link-scan',
                       ),
                     );
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -211,7 +211,7 @@ class AboutTab extends StatelessWidget {
                         SizedBox(width: 12.0),
                         Expanded(
                           child: Text(
-                            'github.com/s4rrar/wifi-barcode-scanner',
+                            'github.com/s4rrar/link-scan',
                             style: TextStyle(
                               color: polishOnSurface,
                               fontSize: 13.0,
