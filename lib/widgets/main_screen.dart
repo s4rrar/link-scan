@@ -51,15 +51,17 @@ class _MainScreenState extends State<MainScreen> {
                         Container(
                           width: 40.0,
                           height: 40.0,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            color: polishPrimaryContainer,
                           ),
                           alignment: Alignment.center,
-                          child: Icon(
-                            Icons.qr_code_scanner,
-                            color: polishOnPrimaryContainer,
-                            size: 22.0,
+                          child: ClipOval(
+                            child: Image.asset(
+                              'logo/logo.png',
+                              width: 40.0,
+                              height: 40.0,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12.0),
@@ -68,7 +70,7 @@ class _MainScreenState extends State<MainScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'LinkScan',
+                              'LinkScan Pro',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16.0,

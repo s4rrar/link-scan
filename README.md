@@ -1,25 +1,58 @@
-# LinkScan Pro (v1.0.0)
+# 📱 LinkScan Pro (v1.0.0)
 
-LinkScan Pro turns your mobile device into a high-speed, wireless hardware barcode scanner. Using local network connectivity, it pipes barcode and QR code transmissions directly to your cursor focus on any PC or laptop running our friction-free companion server script.
+LinkScan Pro turns your mobile device into a high-speed, wireless hardware barcode scanner. Using local network connectivity, it pipes barcode and QR code transmissions directly to your cursor focus on any PC or laptop running our friction-free companion server.
+
+---
 
 ## 🚀 Key Features
 
-*   **📶 Frictionless Wireless Scan Syncing**
-    Type codes directly into Excel, Google Sheets, databases, or Notepad over local Wi-Fi.
+* **📶 Frictionless Wireless Scan Syncing**
+  Type codes directly into Excel, Google Sheets, databases, or Notepad over local Wi-Fi.
+* **💻 Natively Managed Desktop Companion**
+  On Windows, download, run, stop, and monitor the companion process (**LinkScanPC**) directly inside the application's interactive terminal tab.
+* **🔦 Live Camera Flash Support**
+  Toggle the camera flash to read barcodes in low-light warehouse conditions.
+* **💾 Offline SQLite Scan Logs**
+  Access scan history and sync statuses anywhere, even when disconnected.
+* **⏱️ Anti-Duplicate Cooldown Control**
+  Customizable sliding window filters out accidental double scans seamlessly.
 
-*   **🔦 Live Camera Flash Support**
-    Toggle the camera flash to read barcodes in low-light warehouse conditions.
+---
 
-*   **💾 Offline SQLite Scan Logs**
-    Access scan history and sync statuses anywhere, even when disconnected.
+## 🖥️ LinkScanPC Companion Server
 
-*   **⏱️ Anti-Duplicate Cooldown Control**
-    Customizable sliding window filters out accidental double scans seamlessly (defaulting to a swift 0.5 seconds).
+The desktop companion receiver runs a local HTTP server that emulates keyboard inputs to type barcode inputs at cursor focus.
+
+### Natively on Windows
+Within the **Companion** tab of the Windows app, you can:
+1. Click **Download LinkScanPC.exe** to download the latest executable from GitHub releases.
+2. Click **Start Companion** to run it.
+3. View logs in real-time within the app's terminal emulator interface.
+4. Stop or delete the executable easily.
+
+### Python / Cross-Platform Fallback
+For macOS, Linux, or custom setups:
+1. Save the receiver script from the **Companion** tab as `receiver.py`.
+2. Install dependencies:
+   ```bash
+   pip install pyautogui pynput
+   ```
+3. Run the script:
+   ```bash
+   python receiver.py
+   ```
+
+### ⚙️ Settings & Configuration
+By default, the server runs on port **8080**. All tray status, custom ports, and auto-typing settings are saved locally at:
+* Windows: `%USERPROFILE%\.linkscanpc\settings.json`
+* macOS/Linux: `~/.linkscanpc/settings.json`
+
+---
 
 ## 💻 Open Source Repository
 
-Access documentation, submit bug reports, or contribute to the project on GitHub:
-👉 [github.com/s4rrar/link-scan](https://github.com/s4rrar/link-scan)
+Access source code, documentation, submit bug reports, or contribute to the project on GitHub:
+👉 **[github.com/s4rrar/wifi-barcode-scanner](https://github.com/s4rrar/wifi-barcode-scanner)**
 
 ---
 *Made with ❤️ for faster workflows.*

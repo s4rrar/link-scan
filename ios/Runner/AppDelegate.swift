@@ -10,7 +10,7 @@ import AudioToolbox
   ) -> Bool {
     let result = super.application(application, didFinishLaunchingWithOptions: launchOptions)
     if let controller = window?.rootViewController as? FlutterViewController {
-      let beepChannel = FlutterMethodChannel(name: "com.example.wifi_barcode_scanner/beep",
+      let beepChannel = FlutterMethodChannel(name: "com.example.link_scan_pc/beep",
                                             binaryMessenger: controller.binaryMessenger)
       beepChannel.setMethodCallHandler({
         (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in

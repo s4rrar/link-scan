@@ -1,6 +1,6 @@
 {
-    "name": "wifi_barcode_scanner",
-    "short_name": "wifi_barcode_scanner",
+    "name": "LinkScan Pro",
+    "short_name": "LinkScan Pro",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

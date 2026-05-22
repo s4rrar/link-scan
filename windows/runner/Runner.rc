@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "wifi_barcode_scanner" "\0"
+            VALUE "FileDescription", "LinkScan Pro" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "wifi_barcode_scanner" "\0"
+            VALUE "InternalName", "LinkScanPC" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "wifi_barcode_scanner.exe" "\0"
-            VALUE "ProductName", "wifi_barcode_scanner" "\0"
+            VALUE "OriginalFilename", "LinkScanPC.exe" "\0"
+            VALUE "ProductName", "LinkScan Pro" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

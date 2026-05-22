@@ -218,7 +218,7 @@ class BarcodeViewModel extends ChangeNotifier {
       HapticFeedback.lightImpact();
     }
     if (_soundEnabled) {
-      const MethodChannel('com.example.wifi_barcode_scanner/beep').invokeMethod('beep').catchError((e) {
+      const MethodChannel('com.example.link_scan_pc/beep').invokeMethod('beep').catchError((e) {
         if (kDebugMode) {
           print("Error playing beep: $e");
         }

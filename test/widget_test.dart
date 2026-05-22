@@ -8,8 +8,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:wifi_barcode_scanner/main.dart';
-import 'package:wifi_barcode_scanner/viewmodels/barcode_viewmodel.dart';
+import 'package:link_scan_pc/main.dart';
+import 'package:link_scan_pc/viewmodels/barcode_viewmodel.dart';
 
 void main() {
   // Initialize ffi for sqflite in tests

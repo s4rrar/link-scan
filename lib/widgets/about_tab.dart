@@ -18,25 +18,25 @@ class AboutTab extends StatelessWidget {
                 width: 96.0,
                 height: 96.0,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [polishPrimary, Color(0xFF1E88E5)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: Colors.transparent,
                   borderRadius: BorderRadius.circular(28.0),
                   boxShadow: [
                     BoxShadow(
-                      color: polishPrimary.withOpacity(0.25),
+                      color: polishPrimary.withOpacity(0.15),
                       blurRadius: 16.0,
                       offset: const Offset(0, 8),
                     ),
                   ],
                 ),
                 alignment: Alignment.center,
-                child: const Icon(
-                  Icons.qr_code_scanner,
-                  color: Colors.white,
-                  size: 52.0,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24.0),
+                  child: Image.asset(
+                    'logo/logo.png',
+                    width: 96.0,
+                    height: 96.0,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
               const SizedBox(height: 20.0),
@@ -182,7 +182,7 @@ class AboutTab extends StatelessWidget {
                   onTap: () {
                     Clipboard.setData(
                       const ClipboardData(
-                        text: 'https://github.com/s4rrar/link-scan',
+                        text: 'https://github.com/s4rrar/wifi-barcode-scanner',
                       ),
                     );
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -211,7 +211,7 @@ class AboutTab extends StatelessWidget {
                         SizedBox(width: 12.0),
                         Expanded(
                           child: Text(
-                            'github.com/s4rrar/link-scan',
+                            'github.com/s4rrar/wifi-barcode-scanner',
                             style: TextStyle(
                               color: polishOnSurface,
                               fontSize: 13.0,
