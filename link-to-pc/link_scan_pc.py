@@ -254,11 +254,11 @@ def toggle_server():
 DARK  = {"bg": "#121314", "fg": "#E2E2E6", "acc": "#9ECAFF", "acc_hover": "#C4E2FF",
          "on_acc": "#003258", "card": "#1A1C1E", "border": "#3B4858", "entry_bg": "#0F1113",
          "dim": "#8E9099", "red": "#FFB4AB", "red_hover": "#FFDAD6", "on_red": "#690005",
-         "yellow": "#BBC7DB"}
+         "yellow": "#FFD54F"}
 LIGHT = {"bg": "#FDFBFF", "fg": "#1A1C1E", "acc": "#0061A4", "acc_hover": "#00497D",
          "on_acc": "#FFFFFF", "card": "#FFFFFF", "border": "#D6E4F7", "entry_bg": "#F3F3FA",
          "dim": "#535F70", "red": "#BA1A1A", "red_hover": "#FFDAD6", "on_red": "#FFFFFF",
-         "yellow": "#C4C6D0"}
+         "yellow": "#F57F17"}
 
 
 def get_theme():
@@ -280,45 +280,127 @@ class SettingsWindow:
 
     def _apply_theme(self):
         t = get_theme()
+        self.t = t
         self.root.configure(bg=t["bg"])
         style = ttk.Style(self.root)
         style.theme_use("clam")
-        style.configure("TFrame",       background=t["bg"])
-        style.configure("Card.TFrame",  background=t["card"], relief="flat")
-        style.configure("TLabel",       background=t["bg"],   foreground=t["fg"],
+        
+        # Configure standard layouts and colors
+        style.configure("TFrame", background=t["bg"])
+        style.configure("Card.TFrame", background=t["card"], relief="flat")
+        style.configure("TLabel", background=t["bg"], foreground=t["fg"],
                         font=("Segoe UI", 10))
-        style.configure("Head.TLabel",  background=t["bg"],   foreground=t["acc"],
+        style.configure("Head.TLabel", background=t["bg"], foreground=t["acc"],
                         font=("Segoe UI", 13, "bold"))
-        style.configure("Sub.TLabel",   background=t["bg"],   foreground=t["dim"],
+        style.configure("Sub.TLabel", background=t["bg"], foreground=t["dim"],
                         font=("Segoe UI", 9))
-        style.configure("Card.TLabel",  background=t["card"], foreground=t["fg"],
+        style.configure("Card.TLabel", background=t["card"], foreground=t["fg"],
                         font=("Segoe UI", 10))
-        style.configure("Stat.TLabel",  background=t["card"], foreground=t["acc"],
+        style.configure("Stat.TLabel", background=t["card"], foreground=t["acc"],
                         font=("Segoe UI", 22, "bold"))
-        style.configure("TButton",      background=t["acc"],  foreground=t["on_acc"],
-                        font=("Segoe UI", 10, "bold"), padding=6, relief="flat")
+        
+        # Buttons styling (Material Flat style with hover)
+        style.configure("TButton", background=t["acc"], foreground=t["on_acc"],
+                        font=("Segoe UI", 10, "bold"), padding=8, relief="flat", borderwidth=0)
         style.map("TButton",
                   background=[("active", t["acc_hover"]), ("disabled", t["border"])],
                   foreground=[("active", t["on_acc"])])
-        style.configure("Stop.TButton", background=t["red"],  foreground=t["on_red"])
-        style.map("Stop.TButton",       background=[("active", t["red_hover"])],
+        
+        style.configure("Stop.TButton", background=t["red"], foreground=t["on_red"],
+                        font=("Segoe UI", 10, "bold"), padding=8, relief="flat", borderwidth=0)
+        style.map("Stop.TButton",
+                  background=[("active", t["red_hover"])],
                   foreground=[("active", t["on_red"])])
-        style.configure("TEntry",       fieldbackground=t["entry_bg"],
-                        foreground=t["fg"], insertcolor=t["acc"],
-                        font=("Segoe UI", 10))
-        style.configure("TCombobox",    fieldbackground=t["entry_bg"],
-                        foreground=t["fg"], font=("Segoe UI", 10))
+        
+        style.configure("TEntry", fieldbackground=t["entry_bg"], foreground=t["fg"],
+                        insertcolor=t["acc"], font=("Segoe UI", 10), bordercolor=t["border"])
+                        
+        style.configure("TCombobox", fieldbackground=t["entry_bg"], foreground=t["fg"],
+                        font=("Segoe UI", 10), bordercolor=t["border"])
+                        
         style.configure("TCheckbutton", background=t["bg"], foreground=t["fg"],
                         font=("Segoe UI", 10))
+        style.map("TCheckbutton",
+                  background=[("active", t["bg"])],
+                  foreground=[("active", t["fg"])])
+                  
         style.configure("Horizontal.TScale", background=t["bg"], troughcolor=t["border"])
-        style.configure("TNotebook",         background=t["bg"], tabmargins=[2, 2, 0, 0])
+        style.configure("TNotebook", background=t["bg"], borderwidth=0, tabmargins=[2, 2, 0, 0])
         style.configure("TNotebook.Tab",
                         background=t["card"], foreground=t["dim"],
                         font=("Segoe UI", 10), padding=[14, 6])
         style.map("TNotebook.Tab",
                   background=[("selected", t["bg"])],
                   foreground=[("selected", t["acc"])])
-        self.t = t
+                  
+        style.configure("Treeview",
+                        background=t["card"], foreground=t["fg"],
+                        fieldbackground=t["card"], rowheight=26,
+                        font=("Segoe UI", 9))
+        style.configure("Treeview.Heading",
+                        background=t["border"], foreground=t["dim"],
+                        font=("Segoe UI", 9, "bold"))
+        style.map("Treeview", background=[("selected", t["acc"])],
+                  foreground=[("selected", t["on_acc"])])
+
+        # Dynamic Combobox Listbox colors via option db
+        self.root.option_add("*TCombobox*Listbox.background", t["entry_bg"])
+        self.root.option_add("*TCombobox*Listbox.foreground", t["fg"])
+        self.root.option_add("*TCombobox*Listbox.selectBackground", t["acc"])
+        self.root.option_add("*TCombobox*Listbox.selectForeground", t["on_acc"])
+
+        # If window is already initialized and open, propagate theme changes recursively
+        if hasattr(self, "root") and self.root.winfo_exists():
+            self._update_all_widgets(self.root)
+            
+        # Update the status pill dynamically
+        if hasattr(self, "_status_pill") and self._status_pill.winfo_exists():
+            if server_running:
+                self._status_pill.configure(bg=t["acc"], fg=t["on_acc"])
+            else:
+                self._status_pill.configure(bg=t["red"], fg=t["on_red"])
+
+    def _update_all_widgets(self, parent):
+        t = self.t
+        for w in parent.winfo_children():
+            # Recursively update children
+            self._update_all_widgets(w)
+            
+            role = getattr(w, "theme_role", None)
+            if not role:
+                continue
+                
+            w_class = w.winfo_class()
+            
+            if role == "bg":
+                w.configure(bg=t["bg"])
+            elif role == "card":
+                w.configure(bg=t["card"], highlightbackground=t["border"])
+            elif role == "border":
+                w.configure(bg=t["border"])
+            elif role == "header":
+                w.configure(bg=t["bg"], fg=t["acc"])
+            elif role == "text":
+                is_in_card = getattr(w, "is_in_card", False)
+                w.configure(bg=t["card"] if is_in_card else t["bg"], fg=t["fg"])
+            elif role == "label_normal":
+                w.configure(bg=t["bg"], fg=t["fg"])
+            elif role == "dim":
+                is_in_card = getattr(w, "is_in_card", False)
+                w.configure(bg=t["card"] if is_in_card else t["bg"], fg=t["dim"])
+            elif role == "acc_bold":
+                is_in_card = getattr(w, "is_in_card", False)
+                w.configure(bg=t["card"] if is_in_card else t["bg"], fg=t["acc"])
+            elif role == "warning":
+                w.configure(bg=t["bg"], fg=t["yellow"])
+            elif role == "radiobutton":
+                w.configure(bg=t["bg"], fg=t["fg"], selectcolor=t["card"],
+                            activebackground=t["bg"])
+            elif role == "ep_method":
+                # Keeps custom color based on method
+                method = getattr(w, "method_type", "POST")
+                fg_col = t["acc"] if method == "POST" else t["yellow"]
+                w.configure(bg=t["card"], fg=fg_col)
 
     def _build_ui(self):
         t = self.t
@@ -326,15 +408,21 @@ class SettingsWindow:
 
         # ── header ──
         hdr = tk.Frame(root, bg=t["bg"], pady=12)
+        hdr.theme_role = "bg"
         hdr.pack(fill="x", padx=20)
-        tk.Label(hdr, text="⬡  LinkScanPC",
-                 bg=t["bg"], fg=t["acc"],
-                 font=("Segoe UI", 16, "bold")).pack(side="left")
+        
+        lbl_logo = tk.Label(hdr, text="⬡  LinkScanPC",
+                            bg=t["bg"], fg=t["acc"],
+                            font=("Segoe UI", 16, "bold"))
+        lbl_logo.theme_role = "header"
+        lbl_logo.pack(side="left")
 
         self._ip_var = tk.StringVar(value=self._local_ip())
-        tk.Label(hdr, textvariable=self._ip_var,
-                 bg=t["bg"], fg=t["dim"],
-                 font=("Segoe UI", 9)).pack(side="right", pady=4)
+        lbl_ip = tk.Label(hdr, textvariable=self._ip_var,
+                          bg=t["bg"], fg=t["dim"],
+                          font=("Segoe UI", 9))
+        lbl_ip.theme_role = "dim"
+        lbl_ip.pack(side="right", pady=4)
 
         # ── notebook ──
         nb = ttk.Notebook(root)
@@ -357,9 +445,13 @@ class SettingsWindow:
 
         # ── footer ──
         foot = tk.Frame(root, bg=t["border"], height=1)
+        foot.theme_role = "border"
         foot.pack(fill="x")
+        
         fbar = tk.Frame(root, bg=t["bg"], pady=8)
+        fbar.theme_role = "bg"
         fbar.pack(fill="x", padx=16)
+        
         ttk.Button(fbar, text="Save Settings", command=self._save).pack(side="right", padx=4)
         ttk.Button(fbar, text="Hide to Tray",  command=self._hide).pack(side="right", padx=4)
 
@@ -369,32 +461,44 @@ class SettingsWindow:
         parent.configure(style="TFrame")
 
         # Status card
-        scard = tk.Frame(parent, bg=t["card"], bd=0, pady=12, padx=16)
+        scard = tk.Frame(parent, bg=t["card"], bd=0, highlightthickness=1, highlightbackground=t["border"], pady=12, padx=16)
+        scard.theme_role = "card"
         scard.pack(fill="x", padx=14, pady=(14, 6))
 
         top = tk.Frame(scard, bg=t["card"])
+        top.theme_role = "card"
         top.pack(fill="x")
 
-        tk.Label(top, text="SERVER STATUS", bg=t["card"], fg=t["dim"],
-                 font=("Segoe UI", 8, "bold")).pack(side="left")
+        lbl_srv = tk.Label(top, text="SERVER STATUS", bg=t["card"], fg=t["dim"],
+                           font=("Segoe UI", 8, "bold"))
+        lbl_srv.theme_role = "dim"
+        lbl_srv.is_in_card = True
+        lbl_srv.pack(side="left")
 
         self._status_pill = tk.Label(top, text="  ● OFFLINE  ",
                                      bg=t["red"], fg=t["on_red"],
                                      font=("Segoe UI", 9, "bold"), padx=6)
+        self._status_pill.theme_role = "status_pill"
         self._status_pill.pack(side="right")
 
         self._status_var = tk.StringVar(value="Server is not running")
-        tk.Label(scard, textvariable=self._status_var,
-                 bg=t["card"], fg=t["fg"],
-                 font=("Segoe UI", 11)).pack(anchor="w", pady=(6, 0))
+        lbl_status = tk.Label(scard, textvariable=self._status_var,
+                              bg=t["card"], fg=t["fg"],
+                              font=("Segoe UI", 11))
+        lbl_status.theme_role = "text"
+        lbl_status.is_in_card = True
+        lbl_status.pack(anchor="w", pady=(6, 0))
 
         self._port_label = tk.Label(scard, text=f"Port: {cfg['port']}",
                                     bg=t["card"], fg=t["dim"],
                                     font=("Segoe UI", 9))
+        self._port_label.theme_role = "dim"
+        self._port_label.is_in_card = True
         self._port_label.pack(anchor="w")
 
         # Toggle button
         btn_frame = tk.Frame(parent, bg=t["bg"])
+        btn_frame.theme_role = "bg"
         btn_frame.pack(fill="x", padx=14, pady=4)
         self._toggle_btn = ttk.Button(btn_frame, text="▶  Start Server",
                                       command=toggle_server)
@@ -402,34 +506,57 @@ class SettingsWindow:
 
         # Stats row
         stats = tk.Frame(parent, bg=t["bg"])
+        stats.theme_role = "bg"
         stats.pack(fill="x", padx=14, pady=8)
         self._stat_count = self._stat_card(stats, "SCANS TODAY", "0")
         self._stat_ip    = self._stat_card(stats, "LOCAL IP",    self._local_ip())
         self._stat_port  = self._stat_card(stats, "PORT",        str(cfg["port"]))
 
         # Last scan
-        lcard = tk.Frame(parent, bg=t["card"], bd=0, pady=10, padx=16)
+        lcard = tk.Frame(parent, bg=t["card"], bd=0, highlightthickness=1, highlightbackground=t["border"], pady=10, padx=16)
+        lcard.theme_role = "card"
         lcard.pack(fill="x", padx=14, pady=(0, 10))
-        tk.Label(lcard, text="LAST SCAN", bg=t["card"], fg=t["dim"],
-                 font=("Segoe UI", 8, "bold")).pack(anchor="w")
+        
+        lbl_last = tk.Label(lcard, text="LAST SCAN", bg=t["card"], fg=t["dim"],
+                            font=("Segoe UI", 8, "bold"))
+        lbl_last.theme_role = "dim"
+        lbl_last.is_in_card = True
+        lbl_last.pack(anchor="w")
+        
         self._last_var = tk.StringVar(value="—")
-        tk.Label(lcard, textvariable=self._last_var,
-                 bg=t["card"], fg=t["acc"],
-                 font=("Segoe UI", 14, "bold")).pack(anchor="w", pady=(4, 0))
+        lbl_last_val = tk.Label(lcard, textvariable=self._last_var,
+                                bg=t["card"], fg=t["acc"],
+                                font=("Segoe UI", 14, "bold"))
+        lbl_last_val.theme_role = "acc_bold"
+        lbl_last_val.is_in_card = True
+        lbl_last_val.pack(anchor="w", pady=(4, 0))
+        
         self._last_ts = tk.StringVar(value="")
-        tk.Label(lcard, textvariable=self._last_ts,
-                 bg=t["card"], fg=t["dim"],
-                 font=("Segoe UI", 8)).pack(anchor="w")
+        lbl_last_ts_val = tk.Label(lcard, textvariable=self._last_ts,
+                                   bg=t["card"], fg=t["dim"],
+                                   font=("Segoe UI", 8))
+        lbl_last_ts_val.theme_role = "dim"
+        lbl_last_ts_val.is_in_card = True
+        lbl_last_ts_val.pack(anchor="w")
 
     def _stat_card(self, parent, label, value):
         t  = self.t
-        fr = tk.Frame(parent, bg=t["card"], pady=10, padx=12)
+        fr = tk.Frame(parent, bg=t["card"], highlightthickness=1, highlightbackground=t["border"], bd=0, pady=10, padx=12)
+        fr.theme_role = "card"
         fr.pack(side="left", fill="x", expand=True, padx=4)
-        tk.Label(fr, text=label, bg=t["card"], fg=t["dim"],
-                 font=("Segoe UI", 8, "bold")).pack(anchor="w")
+        
+        lbl = tk.Label(fr, text=label, bg=t["card"], fg=t["dim"],
+                       font=("Segoe UI", 8, "bold"))
+        lbl.theme_role = "dim"
+        lbl.is_in_card = True
+        lbl.pack(anchor="w")
+        
         var = tk.StringVar(value=value)
-        tk.Label(fr, textvariable=var, bg=t["card"], fg=t["acc"],
-                 font=("Segoe UI", 16, "bold")).pack(anchor="w")
+        val_lbl = tk.Label(fr, textvariable=var, bg=t["card"], fg=t["acc"],
+                           font=("Segoe UI", 16, "bold"))
+        val_lbl.theme_role = "acc_bold"
+        val_lbl.is_in_card = True
+        val_lbl.pack(anchor="w")
         return var
 
     # ── Server settings tab ───────────────────────────────────────────────────
@@ -437,18 +564,28 @@ class SettingsWindow:
         t = self.t
         pad = {"padx": 18, "pady": 6}
 
-        tk.Label(parent, text="HTTP Listener Configuration",
-                 bg=t["bg"], fg=t["acc"],
-                 font=("Segoe UI", 12, "bold")).pack(anchor="w", **pad)
+        lbl_title = tk.Label(parent, text="HTTP Listener Configuration",
+                             bg=t["bg"], fg=t["acc"],
+                             font=("Segoe UI", 12, "bold"))
+        lbl_title.theme_role = "header"
+        lbl_title.pack(anchor="w", **pad)
 
         row = tk.Frame(parent, bg=t["bg"])
+        row.theme_role = "bg"
         row.pack(fill="x", **pad)
-        tk.Label(row, text="Listen Port:", bg=t["bg"], fg=t["fg"],
-                 font=("Segoe UI", 10), width=16, anchor="w").pack(side="left")
+        
+        lbl_port = tk.Label(row, text="Listen Port:", bg=t["bg"], fg=t["fg"],
+                            font=("Segoe UI", 10), width=16, anchor="w")
+        lbl_port.theme_role = "label_normal"
+        lbl_port.pack(side="left")
+        
         self._port_var = tk.StringVar(value=str(cfg["port"]))
         ttk.Entry(row, textvariable=self._port_var, width=8).pack(side="left", padx=6)
-        tk.Label(row, text="(default 8080)", bg=t["bg"], fg=t["dim"],
-                 font=("Segoe UI", 9)).pack(side="left")
+        
+        lbl_port_def = tk.Label(row, text="(default 8080)", bg=t["bg"], fg=t["dim"],
+                                font=("Segoe UI", 9))
+        lbl_port_def.theme_role = "dim"
+        lbl_port_def.pack(side="left")
 
         # Checkboxes
         self._chk_notify = self._checkbox(parent, "Show desktop notifications",
@@ -460,67 +597,111 @@ class SettingsWindow:
 
         # Theme toggle
         row2 = tk.Frame(parent, bg=t["bg"])
+        row2.theme_role = "bg"
         row2.pack(fill="x", **pad)
-        tk.Label(row2, text="Theme:", bg=t["bg"], fg=t["fg"],
-                 font=("Segoe UI", 10), width=16, anchor="w").pack(side="left")
+        
+        lbl_theme = tk.Label(row2, text="Theme:", bg=t["bg"], fg=t["fg"],
+                             font=("Segoe UI", 10), width=16, anchor="w")
+        lbl_theme.theme_role = "label_normal"
+        lbl_theme.pack(side="left")
+        
         self._theme_var = tk.StringVar(value=cfg.get("theme", "dark"))
         for v, lbl in [("dark", "Dark"), ("light", "Light")]:
-            tk.Radiobutton(row2, text=lbl, variable=self._theme_var, value=v,
-                           bg=t["bg"], fg=t["fg"], selectcolor=t["card"],
-                           activebackground=t["bg"], font=("Segoe UI", 10)).pack(side="left", padx=8)
+            rb = tk.Radiobutton(row2, text=lbl, variable=self._theme_var, value=v,
+                                bg=t["bg"], fg=t["fg"], selectcolor=t["card"],
+                                activebackground=t["bg"], font=("Segoe UI", 10))
+            rb.theme_role = "radiobutton"
+            rb.pack(side="left", padx=8)
 
         # Divider
-        tk.Frame(parent, bg=t["border"], height=1).pack(fill="x", padx=18, pady=10)
+        div = tk.Frame(parent, bg=t["border"], height=1)
+        div.theme_role = "border"
+        div.pack(fill="x", padx=18, pady=10)
 
         # Endpoint info
-        tk.Label(parent, text="API Endpoints", bg=t["bg"], fg=t["acc"],
-                 font=("Segoe UI", 11, "bold")).pack(anchor="w", padx=18)
-        ep_frame = tk.Frame(parent, bg=t["card"], pady=10, padx=14)
+        lbl_api = tk.Label(parent, text="API Endpoints", bg=t["bg"], fg=t["acc"],
+                           font=("Segoe UI", 11, "bold"))
+        lbl_api.theme_role = "header"
+        lbl_api.pack(anchor="w", padx=18)
+        
+        ep_frame = tk.Frame(parent, bg=t["card"], bd=0, highlightthickness=1, highlightbackground=t["border"], pady=10, padx=14)
+        ep_frame.theme_role = "card"
         ep_frame.pack(fill="x", padx=18, pady=6)
+        
         for method, path, desc in [
             ("POST", "/scan",  "Receive barcode from Android app"),
             ("GET",  "/ping",  "Health-check — returns {status:ok}"),
         ]:
             r = tk.Frame(ep_frame, bg=t["card"])
+            r.theme_role = "card"
             r.pack(fill="x", pady=2)
-            tk.Label(r, text=method, bg=t["card"],
-                     fg=t["acc"] if method == "POST" else t["yellow"],
-                     font=("Segoe UI", 9, "bold"), width=5).pack(side="left")
-            tk.Label(r, text=path, bg=t["card"], fg=t["fg"],
-                     font=("Segoe UI", 10), width=10, anchor="w").pack(side="left")
-            tk.Label(r, text=desc, bg=t["card"], fg=t["dim"],
-                     font=("Segoe UI", 9)).pack(side="left", padx=6)
+            
+            lbl_method = tk.Label(r, text=method, bg=t["card"],
+                                  fg=t["acc"] if method == "POST" else t["yellow"],
+                                  font=("Segoe UI", 9, "bold"), width=5)
+            lbl_method.theme_role = "ep_method"
+            lbl_method.method_type = method
+            lbl_method.pack(side="left")
+            
+            lbl_path = tk.Label(r, text=path, bg=t["card"], fg=t["fg"],
+                                font=("Segoe UI", 10), width=10, anchor="w")
+            lbl_path.theme_role = "text"
+            lbl_path.is_in_card = True
+            lbl_path.pack(side="left")
+            
+            lbl_desc = tk.Label(r, text=desc, bg=t["card"], fg=t["dim"],
+                                font=("Segoe UI", 9))
+            lbl_desc.theme_role = "dim"
+            lbl_desc.is_in_card = True
+            lbl_desc.pack(side="left", padx=6)
 
     # ── Keyboard Wedge tab ────────────────────────────────────────────────────
     def _build_keyboard(self, parent):
         t   = self.t
         pad = {"padx": 18, "pady": 6}
 
-        tk.Label(parent, text="Keystroke Wedge Settings",
-                 bg=t["bg"], fg=t["acc"],
-                 font=("Segoe UI", 12, "bold")).pack(anchor="w", **pad)
+        lbl_title = tk.Label(parent, text="Keystroke Wedge Settings",
+                             bg=t["bg"], fg=t["acc"],
+                             font=("Segoe UI", 12, "bold"))
+        lbl_title.theme_role = "header"
+        lbl_title.pack(anchor="w", **pad)
 
         if not HAS_KEYBOARD:
-            tk.Label(parent,
-                     text="⚠  pynput unavailable — install it for keystroke support.",
-                     bg=t["bg"], fg=t["yellow"],
-                     font=("Segoe UI", 10)).pack(**pad)
+            lbl_warn = tk.Label(parent,
+                                text="⚠  pynput unavailable — install it for keystroke support.",
+                                bg=t["bg"], fg=t["yellow"],
+                                font=("Segoe UI", 10))
+            lbl_warn.theme_role = "warning"
+            lbl_warn.pack(**pad)
 
         # Prefix
         row = tk.Frame(parent, bg=t["bg"])
+        row.theme_role = "bg"
         row.pack(fill="x", **pad)
-        tk.Label(row, text="Prefix string:", bg=t["bg"], fg=t["fg"],
-                 font=("Segoe UI", 10), width=18, anchor="w").pack(side="left")
+        
+        lbl_prefix = tk.Label(row, text="Prefix string:", bg=t["bg"], fg=t["fg"],
+                              font=("Segoe UI", 10), width=18, anchor="w")
+        lbl_prefix.theme_role = "label_normal"
+        lbl_prefix.pack(side="left")
+        
         self._prefix_var = tk.StringVar(value=cfg.get("prefix", ""))
         ttk.Entry(row, textvariable=self._prefix_var, width=20).pack(side="left")
-        tk.Label(row, text="typed before each barcode", bg=t["bg"], fg=t["dim"],
-                 font=("Segoe UI", 9)).pack(side="left", padx=6)
+        
+        lbl_prefix_desc = tk.Label(row, text="typed before each barcode", bg=t["bg"], fg=t["dim"],
+                                   font=("Segoe UI", 9))
+        lbl_prefix_desc.theme_role = "dim"
+        lbl_prefix_desc.pack(side="left", padx=6)
 
         # Suffix
         row2 = tk.Frame(parent, bg=t["bg"])
+        row2.theme_role = "bg"
         row2.pack(fill="x", **pad)
-        tk.Label(row2, text="Send after scan:", bg=t["bg"], fg=t["fg"],
-                 font=("Segoe UI", 10), width=18, anchor="w").pack(side="left")
+        
+        lbl_suffix = tk.Label(row2, text="Send after scan:", bg=t["bg"], fg=t["fg"],
+                              font=("Segoe UI", 10), width=18, anchor="w")
+        lbl_suffix.theme_role = "label_normal"
+        lbl_suffix.pack(side="left")
+        
         self._suffix_var = tk.StringVar(value=cfg.get("suffix", "enter"))
         sfx_cb = ttk.Combobox(row2, textvariable=self._suffix_var, width=12,
                                values=["enter", "tab", "custom", "none"], state="readonly")
@@ -528,24 +709,36 @@ class SettingsWindow:
         sfx_cb.bind("<<ComboboxSelected>>", self._on_suffix_change)
 
         row3 = tk.Frame(parent, bg=t["bg"])
+        row3.theme_role = "bg"
         row3.pack(fill="x", **pad)
-        tk.Label(row3, text="Custom suffix:", bg=t["bg"], fg=t["fg"],
-                 font=("Segoe UI", 10), width=18, anchor="w").pack(side="left")
+        
+        lbl_cust_sfx = tk.Label(row3, text="Custom suffix:", bg=t["bg"], fg=t["fg"],
+                                font=("Segoe UI", 10), width=18, anchor="w")
+        lbl_cust_sfx.theme_role = "label_normal"
+        lbl_cust_sfx.pack(side="left")
+        
         self._custom_sfx_var = tk.StringVar(value=cfg.get("custom_suffix", ""))
         self._custom_sfx_entry = ttk.Entry(row3, textvariable=self._custom_sfx_var, width=20)
         self._custom_sfx_entry.pack(side="left")
         self._on_suffix_change()
 
         # Divider
-        tk.Frame(parent, bg=t["border"], height=1).pack(fill="x", padx=18, pady=12)
+        div = tk.Frame(parent, bg=t["border"], height=1)
+        div.theme_role = "border"
+        div.pack(fill="x", padx=18, pady=12)
 
         # Flow diagram
-        tk.Label(parent, text="Data Flow", bg=t["bg"], fg=t["acc"],
-                 font=("Segoe UI", 11, "bold")).pack(anchor="w", padx=18)
-        tk.Label(parent,
-                 text="  Android App  →  WiFi  →  HTTP :8080/scan  →  Keystroke Wedge  →  Active Window",
-                 bg=t["bg"], fg=t["dim"],
-                 font=("Segoe UI", 9)).pack(anchor="w", padx=18, pady=4)
+        lbl_flow = tk.Label(parent, text="Data Flow", bg=t["bg"], fg=t["acc"],
+                            font=("Segoe UI", 11, "bold"))
+        lbl_flow.theme_role = "header"
+        lbl_flow.pack(anchor="w", padx=18)
+        
+        lbl_flow_desc = tk.Label(parent,
+                                 text="  Android App  →  WiFi  →  HTTP :8080/scan  →  Keystroke Wedge  →  Active Window",
+                                 bg=t["bg"], fg=t["dim"],
+                                 font=("Segoe UI", 9))
+        lbl_flow_desc.theme_role = "dim"
+        lbl_flow_desc.pack(anchor="w", padx=18, pady=4)
 
     def _on_suffix_change(self, *_):
         is_custom = self._suffix_var.get() == "custom"
@@ -556,9 +749,14 @@ class SettingsWindow:
     def _build_log(self, parent):
         t = self.t
         toolbar = tk.Frame(parent, bg=t["bg"])
+        toolbar.theme_role = "bg"
         toolbar.pack(fill="x", padx=14, pady=8)
-        tk.Label(toolbar, text="Recent Scans", bg=t["bg"], fg=t["acc"],
-                 font=("Segoe UI", 12, "bold")).pack(side="left")
+        
+        lbl_recent = tk.Label(toolbar, text="Recent Scans", bg=t["bg"], fg=t["acc"],
+                              font=("Segoe UI", 12, "bold"))
+        lbl_recent.theme_role = "header"
+        lbl_recent.pack(side="left")
+        
         ttk.Button(toolbar, text="Clear", command=self._clear_log).pack(side="right", padx=2)
         ttk.Button(toolbar, text="Export", command=self._export_log).pack(side="right", padx=2)
 
@@ -575,18 +773,6 @@ class SettingsWindow:
         self._tree.configure(yscrollcommand=sb.set)
         self._tree.pack(side="left", fill="both", expand=True, padx=(14, 0), pady=(0, 10))
         sb.pack(side="left", fill="y", pady=(0, 10))
-
-        # Style the treeview
-        style = ttk.Style()
-        style.configure("Treeview",
-                        background=t["card"], foreground=t["fg"],
-                        fieldbackground=t["card"], rowheight=24,
-                        font=("Segoe UI", 9))
-        style.configure("Treeview.Heading",
-                        background=t["border"], foreground=t["dim"],
-                        font=("Segoe UI", 9, "bold"))
-        style.map("Treeview", background=[("selected", t["acc"])],
-                  foreground=[("selected", t["on_acc"])])
 
         self._tree.bind("<Double-1>", self._copy_row)
 
@@ -608,11 +794,21 @@ class SettingsWindow:
         save_settings(cfg)
         self._port_label.configure(text=f"Port: {cfg['port']}")
         self._stat_port.set(str(cfg["port"]))
-        # Update styling dynamically on save so changes reflect immediately!
+        
+        # Apply the theme styling changes dynamically
         self._apply_theme()
-        # Refresh header/UI elements bg
+        
+        # Refresh root window background color
         t = self.t
         self.root.configure(bg=t["bg"])
+        
+        # Refresh system tray icon to match new light/dark theme colors
+        if tray_icon:
+            try:
+                tray_icon.icon = make_tray_image(active=server_running)
+            except Exception:
+                pass
+                
         messagebox.showinfo("Saved", "Settings saved.\nRestart the server for port changes to take effect.")
 
     def _clear_log(self):

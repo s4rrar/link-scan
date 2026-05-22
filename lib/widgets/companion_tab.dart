@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io' as io;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -17,121 +16,6 @@ class CompanionTab extends StatefulWidget {
 }
 
 class _CompanionTabState extends State<CompanionTab> {
-  static const String _pythonScript = '''# =========================================================================
-#                 📱 LINKSCAN PRO WIFI RECEIVER SERVER 📱
-# =========================================================================
-# Runs a frictionless local HTTP server to receive scans wirelessly.
-# Emulates a keyboard device to pipe barcode values directly to cursor focus.
-#
-# Prerequisite: pip install pyautogui (optional, for auto-typing integration)
-# To run: python receiver.py
-# =========================================================================
-
-import http.server
-import json
-import socket
-import sys
-
-DISABLE_KEYBOARD_EMULATION = False
-try:
-    import pyautogui
-    pyautogui.PAUSE = 0.01 
-    print("[INFO] pyautogui detected! Barcodes will type into any open app.")
-except ImportError:
-    try:
-        from pynput.keyboard import Controller
-        keyboard = Controller()
-        print("[INFO] pynput detected! Barcodes will type into any open app.")
-        pyautogui = None
-    except ImportError:
-        DISABLE_KEYBOARD_EMULATION = True
-        print("[WARN] pyautogui/pynput not found. Barcodes will only log to console.")
-        print("       To enable auto-typing directly into Excel, Notebook, or sheets run:")
-        print("       pip install pyautogui")
-
-class BarcodeReceiverHandler(http.server.BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == '/ping':
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(b'{"status": "ok"}')
-        else:
-            self.send_response(404)
-            self.end_headers()
-
-    def do_POST(self):
-        if self.path == '/scan':
-            content_length = int(self.headers['Content-Length'])
-            post_data = self.rfile.read(content_length)
-            try:
-                data = json.loads(post_data.decode('utf-8'))
-                barcode = data.get('barcode', '')
-                barcode_format = data.get('format', 'Barcode')
-                print(f"[SCAN] Scanned: {barcode} | Type: {barcode_format}")
-                
-                # Send HTTP OK immediately to release mobile client thread
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(b'{"status": "received"}')
-                
-                # Emulate keystroke typing
-                if not DISABLE_KEYBOARD_EMULATION:
-                    if 'pyautogui' in sys.modules and pyautogui is not None:
-                        pyautogui.write(barcode)
-                        pyautogui.press('enter')
-                    elif 'pynput' in sys.modules:
-                        keyboard.type(barcode)
-                        from pynput.keyboard import Key
-                        keyboard.press(Key.enter)
-                        keyboard.release(Key.enter)
-            except Exception as e:
-                print(f"[ERR] Failed to process scan: {e}")
-                self.send_response(400)
-                self.end_headers()
-        else:
-            self.send_response(404)
-            self.end_headers()
-
-    def log_message(self, format, *args):
-        pass
-
-def get_local_ip():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        s.connect(('8.8.8.8', 1))
-        local_ip = s.getsockname()[0]
-    except Exception:
-        local_ip = '127.0.0.1'
-    finally:
-        s.close()
-    return local_ip
-
-def run_server(port=8080):
-    local_ip = get_local_ip()
-    httpd = http.server.HTTPServer(('', port), BarcodeReceiverHandler)
-    print("=" * 66)
-    print("  LinkScan Pro Companion server is live and listening on local network!")
-    print("=" * 66)
-    print(f"  PC Local IP Address to enter in phone:  \\033[92m{local_ip}\\033[0m")
-    print(f"  Target Port Number:                    \\033[92m{port}\\033[0m")
-    print(f"  Status Check URL:                       http://{local_ip}:{port}/ping")
-    print("=" * 66)
-    print("  Place cursor anywhere in Excel, Google Sheets, or Notepad to start typing...")
-    print("  Exit server anytime by pressing Ctrl + C.")
-    print("=" * 66)
-    try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        print("\\nCompanion server shut down.")
-        httpd.server_close()
-
-if __name__ == '__main__':
-    run_server(8080)''';
-
   bool _isWindows = false;
   bool _isDownloading = false;
   double _downloadProgress = 0.0;
@@ -185,7 +69,9 @@ if __name__ == '__main__':
     setState(() {
       final lines = message.split('\n');
       for (var line in lines) {
-        if (line.trim().isNotEmpty || _logs.isEmpty || _logs.last.trim().isNotEmpty) {
+        if (line.trim().isNotEmpty ||
+            _logs.isEmpty ||
+            _logs.last.trim().isNotEmpty) {
           _logs.add(line);
         }
       }
@@ -193,7 +79,7 @@ if __name__ == '__main__':
         _logs.removeRange(0, _logs.length - 300);
       }
     });
-    
+
     // Smooth scrolling to the end of logs
     Future.microtask(() {
       if (_logScrollController.hasClients) {
@@ -216,13 +102,17 @@ if __name__ == '__main__':
     });
     _addLog('[DOWNLOAD] Requesting LinkScanPC.exe from GitHub releases...');
 
-    final primaryUrl = 'https://github.com/s4rrar/link-scan-pc/releases/latest/download/LinkScanPC.exe';
-    final fallbackUrl = 'https://github.com/s4rrar/wifi-barcode-scanner/releases/latest/download/LinkScanPC.exe';
+    final primaryUrl =
+        'https://github.com/s4rrar/link-scan-pc/releases/latest/download/LinkScanPC.exe';
+    final fallbackUrl =
+        'https://github.com/s4rrar/link-scan/releases/latest/download/LinkScanPC.exe';
 
     try {
       bool success = await _downloadFile(primaryUrl);
       if (!success) {
-        _addLog('[DOWNLOAD] Primary target returned 404 or failed. Trying fallback repository...');
+        _addLog(
+          '[DOWNLOAD] Primary target returned 404 or failed. Trying fallback repository...',
+        );
         setState(() {
           _downloadStatusText = 'Connecting to fallback...';
         });
@@ -234,7 +124,9 @@ if __name__ == '__main__':
         _checkExeExists();
         _showSnackBar('LinkScanPC downloaded successfully!');
       } else {
-        _addLog('[ERROR] Download failed from all sources. Please try again or download manually.');
+        _addLog(
+          '[ERROR] Download failed from all sources. Please try again or download manually.',
+        );
         _showSnackBar('Download failed. Check network or download manually.');
       }
     } catch (e) {
@@ -254,7 +146,9 @@ if __name__ == '__main__':
     final client = http.Client();
     try {
       final request = http.Request('GET', Uri.parse(url));
-      final response = await client.send(request).timeout(const Duration(seconds: 15));
+      final response = await client
+          .send(request)
+          .timeout(const Duration(seconds: 15));
 
       if (response.statusCode != 200) {
         _addLog('[DOWNLOAD] HTTP Error Code: ${response.statusCode}');
@@ -263,7 +157,9 @@ if __name__ == '__main__':
 
       final totalBytes = response.contentLength ?? 0;
       if (totalBytes > 0) {
-        _addLog('[DOWNLOAD] Total File Size: ${(totalBytes / 1024 / 1024).toStringAsFixed(2)} MB');
+        _addLog(
+          '[DOWNLOAD] Total File Size: ${(totalBytes / 1024 / 1024).toStringAsFixed(2)} MB',
+        );
       }
 
       final file = io.File(_exePath!);
@@ -280,13 +176,15 @@ if __name__ == '__main__':
           if (mounted) {
             setState(() {
               _downloadProgress = progress;
-              _downloadStatusText = 'Downloading: ${(progress * 100).toStringAsFixed(1)}%';
+              _downloadStatusText =
+                  'Downloading: ${(progress * 100).toStringAsFixed(1)}%';
             });
           }
         } else {
           if (mounted) {
             setState(() {
-              _downloadStatusText = 'Downloaded ${(downloadedBytes / 1024 / 1024).toStringAsFixed(2)} MB';
+              _downloadStatusText =
+                  'Downloaded ${(downloadedBytes / 1024 / 1024).toStringAsFixed(2)} MB';
             });
           }
         }
@@ -306,7 +204,7 @@ if __name__ == '__main__':
   Future<void> _startProcess() async {
     if (_exePath == null || !_exeExists) return;
     _addLog('[SYSTEM] Starting LinkScanPC.exe process...');
-    
+
     try {
       final file = io.File(_exePath!);
       final workingDir = file.parent.path;
@@ -332,20 +230,26 @@ if __name__ == '__main__':
       _showSnackBar('LinkScanPC companion started!');
 
       // Read stdout safely
-      process.stdout.listen((bytes) {
-        final text = utf8.decode(bytes, allowMalformed: true);
-        _addLog(text);
-      }, onError: (err) {
-        _addLog('[STDOUT ERR] $err');
-      });
+      process.stdout.listen(
+        (bytes) {
+          final text = utf8.decode(bytes, allowMalformed: true);
+          _addLog(text);
+        },
+        onError: (err) {
+          _addLog('[STDOUT ERR] $err');
+        },
+      );
 
       // Read stderr safely
-      process.stderr.listen((bytes) {
-        final text = utf8.decode(bytes, allowMalformed: true);
-        _addLog('[STDERR] $text');
-      }, onError: (err) {
-        _addLog('[STDERR ERR] $err');
-      });
+      process.stderr.listen(
+        (bytes) {
+          final text = utf8.decode(bytes, allowMalformed: true);
+          _addLog('[STDERR] $text');
+        },
+        onError: (err) {
+          _addLog('[STDERR ERR] $err');
+        },
+      );
 
       // Wait for completion
       process.exitCode.then((code) {
@@ -358,7 +262,6 @@ if __name__ == '__main__':
           _showSnackBar('Companion server stopped.');
         }
       });
-
     } catch (e) {
       _addLog('[SYSTEM ERR] Failed to start companion process: $e');
       setState(() {
@@ -382,12 +285,14 @@ if __name__ == '__main__':
 
   Future<void> _deleteExe() async {
     if (_exePath == null || !_exeExists) return;
-    
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Companion?'),
-        content: const Text('Are you sure you want to remove the downloaded LinkScanPC executable? You will need to re-download it to launch it from the app again.'),
+        content: const Text(
+          'Are you sure you want to remove the downloaded LinkScanPC executable? You will need to re-download it to launch it from the app again.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -528,17 +433,18 @@ if __name__ == '__main__':
                 const SizedBox(width: 10.0),
                 const Text(
                   'Windows App Integration',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16.0,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
                 ),
               ],
             ),
             const SizedBox(height: 12.0),
             Text(
               'Manage your local LinkScanPC receiver directly from this app window. No command prompt required.',
-              style: TextStyle(color: polishOnSurfaceVariant, fontSize: 13.0, height: 1.4),
+              style: TextStyle(
+                color: polishOnSurfaceVariant,
+                fontSize: 13.0,
+                height: 1.4,
+              ),
             ),
             const SizedBox(height: 20.0),
 
@@ -575,12 +481,14 @@ if __name__ == '__main__':
                       child: LinearProgressIndicator(
                         value: _downloadProgress > 0 ? _downloadProgress : null,
                         minHeight: 8.0,
-                        backgroundColor: polishPrimaryContainer.withOpacity(0.3),
+                        backgroundColor: polishPrimaryContainer.withOpacity(
+                          0.3,
+                        ),
                         color: polishPrimary,
                       ),
                     ),
                   ],
-                )
+                ),
               ] else ...[
                 SizedBox(
                   width: double.infinity,
@@ -612,7 +520,9 @@ if __name__ == '__main__':
                       height: 46.0,
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _isRunning ? Colors.redAccent : Colors.teal,
+                          backgroundColor: _isRunning
+                              ? Colors.redAccent
+                              : Colors.teal,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.0),
@@ -620,10 +530,16 @@ if __name__ == '__main__':
                           elevation: 0,
                         ),
                         onPressed: _isRunning ? _stopProcess : _startProcess,
-                        icon: Icon(_isRunning ? Icons.stop : Icons.play_arrow, size: 20.0),
+                        icon: Icon(
+                          _isRunning ? Icons.stop : Icons.play_arrow,
+                          size: 20.0,
+                        ),
                         label: Text(
                           _isRunning ? 'Stop Companion' : 'Start Companion',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.0),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13.0,
+                          ),
                         ),
                       ),
                     ),
@@ -660,16 +576,16 @@ if __name__ == '__main__':
       decoration: BoxDecoration(
         color: const Color(0xFF0F1113),
         borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(
-          color: polishOutline.withOpacity(0.3),
-          width: 1.0,
-        ),
+        border: Border.all(color: polishOutline.withOpacity(0.3), width: 1.0),
       ),
       child: Column(
         children: [
           // Terminal Header
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             decoration: BoxDecoration(
               color: polishSurfaceVariant.withOpacity(0.1),
               borderRadius: const BorderRadius.only(
@@ -748,11 +664,17 @@ if __name__ == '__main__':
                   width: 8.0,
                   height: 8.0,
                   decoration: BoxDecoration(
-                    color: _isRunning ? const Color(0xFF4CAF50) : const Color(0xFFFFC107),
+                    color: _isRunning
+                        ? const Color(0xFF4CAF50)
+                        : const Color(0xFFFFC107),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: (_isRunning ? const Color(0xFF4CAF50) : const Color(0xFFFFC107)).withOpacity(0.5),
+                        color:
+                            (_isRunning
+                                    ? const Color(0xFF4CAF50)
+                                    : const Color(0xFFFFC107))
+                                .withOpacity(0.5),
                         blurRadius: 4.0,
                         spreadRadius: 1.0,
                       ),
@@ -821,10 +743,7 @@ if __name__ == '__main__':
           children: [
             const Text(
               '💡 Configuration Tips',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14.0,
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0),
             ),
             const SizedBox(height: 6.0),
             Text(
@@ -863,58 +782,50 @@ if __name__ == '__main__':
                 const SizedBox(width: 10.0),
                 const Text(
                   'LinkScanPC Companion',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16.0,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
                 ),
               ],
             ),
             const SizedBox(height: 10.0),
             Text(
-              'The compiled LinkScanPC executable runs directly on Windows. For non-Windows platforms, or to set up manually, you can download the release or run our python script receiver.',
-              style: TextStyle(color: polishOnSurfaceVariant, fontSize: 12.5, height: 1.5),
+              'The compiled LinkScanPC executable runs directly on Windows. For non-Windows platforms, or to set up manually, you can download the latest releases from GitHub.',
+              style: TextStyle(
+                color: polishOnSurfaceVariant,
+                fontSize: 12.5,
+                height: 1.5,
+              ),
             ),
             const SizedBox(height: 18.0),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: polishPrimary,
-                      foregroundColor: polishOnPrimary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-                      elevation: 0,
-                    ),
-                    onPressed: () {
-                      Clipboard.setData(const ClipboardData(text: _pythonScript));
-                      _showSnackBar('Python script copied to clipboard!');
-                    },
-                    icon: const Icon(Icons.copy, size: 16.0),
-                    label: const Text('Copy Python Script', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
+            SizedBox(
+              width: double.infinity,
+              height: 48.0,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: polishPrimary,
+                  foregroundColor: polishOnPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14.0),
+                  ),
+                  elevation: 0,
+                ),
+                onPressed: () async {
+                  final url = Uri.parse(
+                    'https://github.com/s4rrar/link-scan/releases',
+                  );
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url);
+                  } else {
+                    _showSnackBar('Could not launch URL');
+                  }
+                },
+                icon: const Icon(Icons.open_in_new, size: 20.0),
+                label: const Text(
+                  'Open Releases Page',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(width: 8.0),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-                      side: BorderSide(color: polishPrimary),
-                      foregroundColor: polishPrimary,
-                    ),
-                    onPressed: () async {
-                      final url = Uri.parse('https://github.com/s4rrar/wifi-barcode-scanner/releases');
-                      if (await canLaunchUrl(url)) {
-                        await launchUrl(url);
-                      } else {
-                        _showSnackBar('Could not launch URL');
-                      }
-                    },
-                    icon: const Icon(Icons.open_in_new, size: 16.0),
-                    label: const Text('Open Releases', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
-                  ),
-                ),
-              ],
+              ),
             ),
           ],
         ),
@@ -937,14 +848,30 @@ if __name__ == '__main__':
           children: [
             Text(
               'Quick Setup Instructions',
-              style: TextStyle(fontWeight: FontWeight.bold, color: polishPrimary, fontSize: 15.0),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: polishPrimary,
+                fontSize: 15.0,
+              ),
             ),
             const SizedBox(height: 12.0),
-            _buildStepRow('1', 'Download / Start', 'Install LinkScanPC from GitHub releases or run the receiver.py script on your computer.'),
+            _buildStepRow(
+              '1',
+              'Download / Start',
+              'Install LinkScanPC from GitHub releases on your computer.',
+            ),
             const SizedBox(height: 12.0),
-            _buildStepRow('2', 'Connect to Local Wi-Fi', 'Ensure both your computer and your phone are connected to the exact same Wi-Fi SSID network.'),
+            _buildStepRow(
+              '2',
+              'Connect to Local Wi-Fi',
+              'Ensure both your computer and your phone are connected to the exact same Wi-Fi SSID network.',
+            ),
             const SizedBox(height: 12.0),
-            _buildStepRow('3', 'Configure IP & Port', 'Head to the Settings tab in this App. Enter your PC\'s Local IP address and Port (usually 8080), then press Test Connection.'),
+            _buildStepRow(
+              '3',
+              'Configure IP & Port',
+              'Head to the Settings tab in this App. Enter your PC\'s Local IP address and Port (usually 8080), then press Test Connection.',
+            ),
           ],
         ),
       ),
@@ -979,12 +906,19 @@ if __name__ == '__main__':
             children: [
               Text(
                 title,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13.5,
+                ),
               ),
               const SizedBox(height: 2.0),
               Text(
                 description,
-                style: TextStyle(color: polishOnSurfaceVariant, fontSize: 12.0, height: 1.4),
+                style: TextStyle(
+                  color: polishOnSurfaceVariant,
+                  fontSize: 12.0,
+                  height: 1.4,
+                ),
               ),
             ],
           ),

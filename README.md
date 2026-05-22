@@ -32,7 +32,7 @@ Within the **Companion** tab of the Windows app, you can:
 
 ### Python / Cross-Platform Fallback
 For macOS, Linux, or custom setups:
-1. Save the receiver script from the **Companion** tab as `receiver.py`.
+1. Download the `receiver.py` script from the GitHub repository.
 2. Install dependencies:
    ```bash
    pip install pyautogui pynput
@@ -52,7 +52,7 @@ By default, the server runs on port **8080**. All tray status, custom ports, and
 ## 💻 Open Source Repository
 
 Access source code, documentation, submit bug reports, or contribute to the project on GitHub:
-👉 **[github.com/s4rrar/wifi-barcode-scanner](https://github.com/s4rrar/wifi-barcode-scanner)**
+👉 **[github.com/s4rrar/link-scan](https://github.com/s4rrar/link-scan)**
 
 ---
 *Made with ❤️ for faster workflows.*

@@ -1,4 +1,4 @@
-('D:\\Projects\\Flutter\\wifi-barcode-scanner\\link-to-pc\\build\\LinkScanPC\\PYZ-00.pyz',
+('D:\\Projects\\Flutter\\link-scan\\link-to-pc\\build\\LinkScanPC\\PYZ-00.pyz',
  [('PIL',
    'C:\\Users\\Dark\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\PIL\\__init__.py',
    'PYMODULE'),
