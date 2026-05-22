@@ -138,7 +138,7 @@ if __name__ == '__main__':
   String _downloadStatusText = '';
   io.Process? _process;
   bool _isRunning = false;
-  List<String> _logs = [];
+  final List<String> _logs = [];
   String? _exePath;
   bool _exeExists = false;
   final ScrollController _logScrollController = ScrollController();

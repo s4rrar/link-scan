@@ -25,7 +25,7 @@ void main() {
     // Build our app and trigger a frame.
     await tester.pumpWidget(MyApp(viewModel: viewModel));
 
-    // Verify that the app title 'LinkScan' is displayed.
-    expect(find.text('LinkScan'), findsOneWidget);
+    // Verify that the app title 'LinkScan Pro' is displayed.
+    expect(find.text('LinkScan Pro'), findsOneWidget);
   });
 }
