@@ -5,31 +5,20 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:wifi_barcode_scanner/main.dart';
 import 'package:wifi_barcode_scanner/viewmodels/barcode_viewmodel.dart';
 
 void main() {
+  // Initialize ffi for sqflite in tests
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
+
   testWidgets('Smoke test - App builds successfully', (WidgetTester tester) async {
     // Mock SharedPreferences
     SharedPreferences.setMockInitialValues({});
-    
-    // Mock sqflite MethodChannel
-    const channel = MethodChannel('tekartik_sqflite');
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel, (message) async {
-      if (message.method == 'getDatabasesPath') {
-        return '.';
-      }
-      if (message.method == 'openDatabase') {
-        return 1;
-      }
-      if (message.method == 'query') {
-        return [];
-      }
-      return null;
-    });
 
     final viewModel = BarcodeViewModel();
     
