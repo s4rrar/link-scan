@@ -18,7 +18,7 @@ class AboutTab extends StatelessWidget {
                 width: 96.0,
                 height: 96.0,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
+                  gradient: LinearGradient(
                     colors: [polishPrimary, Color(0xFF1E88E5)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -40,7 +40,7 @@ class AboutTab extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20.0),
-              const Text(
+              Text(
                 'LinkScan Pro',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -59,7 +59,7 @@ class AboutTab extends StatelessWidget {
                   color: polishPrimaryContainer,
                   borderRadius: BorderRadius.circular(100.0),
                 ),
-                child: const Text(
+                child: Text(
                   'v1.0.0',
                   style: TextStyle(
                     color: polishOnPrimaryContainer,
@@ -81,7 +81,7 @@ class AboutTab extends StatelessWidget {
           ),
           color: polishSurface,
           elevation: 0,
-          child: const Padding(
+          child: Padding(
             padding: EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,7 +110,7 @@ class AboutTab extends StatelessWidget {
         const SizedBox(height: 16.0),
 
         // Key Features List
-        const Text(
+        Text(
           'KEY FEATURES',
           style: TextStyle(
             color: polishPrimary,
@@ -161,7 +161,7 @@ class AboutTab extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Open Source Repository',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -170,7 +170,7 @@ class AboutTab extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8.0),
-                const Text(
+                Text(
                   'Access documentation, submit bug reports, or contribute to the project on Github.',
                   style: TextStyle(
                     color: polishOnSurfaceVariant,
@@ -205,7 +205,7 @@ class AboutTab extends StatelessWidget {
                         width: 1.0,
                       ),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
                         Icon(Icons.link, color: polishPrimary, size: 20.0),
                         SizedBox(width: 12.0),
@@ -235,7 +235,7 @@ class AboutTab extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24.0),
-        const Center(
+        Center(
           child: Text(
             'Made by s4rrar for faster workflows.',
             style: TextStyle(color: polishOnSurfaceVariant, fontSize: 11.0),
@@ -270,7 +270,7 @@ class AboutTab extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14.0,
                     color: polishOnBackground,
@@ -279,7 +279,7 @@ class AboutTab extends StatelessWidget {
                 const SizedBox(height: 2.0),
                 Text(
                   description,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: polishOnSurfaceVariant,
                     fontSize: 12.0,
                     height: 1.4,

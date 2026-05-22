@@ -125,7 +125,7 @@ if __name__ == '__main__':
     return ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
-        const Text(
+        Text(
           'DESKTOP COMPANION SETUP',
           style: TextStyle(
             color: polishPrimary,
@@ -135,7 +135,7 @@ if __name__ == '__main__':
           ),
         ),
         const SizedBox(height: 4.0),
-        const Text(
+        Text(
           'Generate wireless keystrokes onto your PC instantly by following our 3-step guide.',
           style: TextStyle(
             color: polishOnSurfaceVariant,
@@ -157,12 +157,12 @@ if __name__ == '__main__':
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   '1. Download and Copy Script',
                   style: TextStyle(fontWeight: FontWeight.bold, color: polishPrimary, fontSize: 15.0),
                 ),
                 const SizedBox(height: 6.0),
-                const Text(
+                Text(
                   'Tap the copy button below to save the clean python companion receiver onto your clipboard.',
                   style: TextStyle(color: polishOnSurfaceVariant, fontSize: 12.0),
                 ),
@@ -203,7 +203,7 @@ if __name__ == '__main__':
           ),
           color: polishSurface,
           elevation: 0,
-          child: const Padding(
+          child: Padding(
             padding: EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,7 +234,7 @@ if __name__ == '__main__':
           ),
           color: polishSurface,
           elevation: 0,
-          child: const Padding(
+          child: Padding(
             padding: EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

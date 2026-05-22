@@ -26,25 +26,25 @@ class HistoryTab extends StatelessWidget {
       builder: (ctx) {
         return AlertDialog(
           backgroundColor: polishSurface,
-          title: const Text(
+          title: Text(
             'Delete Whole History?',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0, color: polishOnSurface),
           ),
           content: Text(
             'This action is permanent and will wipe all ${viewModel.scanHistory.length} locally stored barcode records.',
-            style: const TextStyle(color: polishOnSurfaceVariant),
+            style: TextStyle(color: polishOnSurfaceVariant),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancel', style: TextStyle(color: polishOnSurfaceVariant)),
+              child: Text('Cancel', style: TextStyle(color: polishOnSurfaceVariant)),
             ),
             TextButton(
               onPressed: () {
                 viewModel.clearHistory();
                 Navigator.of(ctx).pop();
               },
-              child: const Text('Delete All', style: TextStyle(color: polishError, fontWeight: FontWeight.bold)),
+              child: Text('Delete All', style: TextStyle(color: polishError, fontWeight: FontWeight.bold)),
             ),
           ],
         );
@@ -66,7 +66,7 @@ class HistoryTab extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'SCAN LOGS',
                     style: TextStyle(
                       color: polishPrimary,
@@ -77,7 +77,7 @@ class HistoryTab extends StatelessWidget {
                   ),
                   Text(
                     '${list.length} items stored',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: polishOnSurfaceVariant,
                       fontSize: 12.0,
                     ),
@@ -87,8 +87,8 @@ class HistoryTab extends StatelessWidget {
               if (list.isNotEmpty)
                 TextButton.icon(
                   onPressed: () => _showDeleteConfirmDialog(context),
-                  icon: const Icon(Icons.delete_sweep, color: polishError),
-                  label: const Text(
+                  icon: Icon(Icons.delete_sweep, color: polishError),
+                  label: Text(
                     'Clear All',
                     style: TextStyle(color: polishError, fontWeight: FontWeight.bold),
                   ),
@@ -108,7 +108,7 @@ class HistoryTab extends StatelessWidget {
                           size: 80.0,
                         ),
                         const SizedBox(height: 16.0),
-                        const Text(
+                        Text(
                           'History Log is Empty',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
@@ -117,7 +117,7 @@ class HistoryTab extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 4.0),
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.symmetric(horizontal: 32.0),
                           child: Text(
                             'Newly scanned codes will appear here automatically.',

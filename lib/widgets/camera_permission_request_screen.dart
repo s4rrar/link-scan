@@ -14,13 +14,13 @@ class CameraPermissionRequestScreen extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.photo_camera_outlined,
             color: polishPrimary,
             size: 96.0,
           ),
           const SizedBox(height: 24.0),
-          const Text(
+          Text(
             'Camera Permission Required',
             style: TextStyle(
               fontWeight: FontWeight.bold,
@@ -30,7 +30,7 @@ class CameraPermissionRequestScreen extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12.0),
-          const Text(
+          Text(
             'To scan physical product barcodes or QR codes in real-time, please authorize camera use below.',
             style: TextStyle(
               fontSize: 14.0,

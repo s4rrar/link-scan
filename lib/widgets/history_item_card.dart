@@ -55,7 +55,7 @@ class HistoryItemCard extends StatelessWidget {
                     children: [
                       Text(
                         item.format,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: polishPrimary,
                           fontWeight: FontWeight.bold,
                           fontSize: 11.0,
@@ -84,7 +84,7 @@ class HistoryItemCard extends StatelessWidget {
                   const SizedBox(height: 4.0),
                   Text(
                     item.barcode,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: polishOnSurface,
                       fontWeight: FontWeight.bold,
                       fontSize: 16.0,
@@ -96,11 +96,11 @@ class HistoryItemCard extends StatelessWidget {
                   const SizedBox(height: 4.0),
                   Row(
                     children: [
-                      const Icon(Icons.access_time, color: polishOnSurfaceVariant, size: 12.0),
+                      Icon(Icons.access_time, color: polishOnSurfaceVariant, size: 12.0),
                       const SizedBox(width: 4.0),
                       Text(
                         formattedTime,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: polishOnSurfaceVariant,
                           fontSize: 11.0,
                         ),
@@ -113,11 +113,11 @@ class HistoryItemCard extends StatelessWidget {
             Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.content_copy, color: polishPrimary),
+                  icon: Icon(Icons.content_copy, color: polishPrimary),
                   onPressed: onCopy,
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline, color: polishError),
+                  icon: Icon(Icons.delete_outline, color: polishError),
                   onPressed: onDelete,
                 ),
               ],

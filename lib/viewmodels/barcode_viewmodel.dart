@@ -26,6 +26,9 @@ class BarcodeViewModel extends ChangeNotifier {
   bool _vibrationEnabled = true;
   bool get vibrationEnabled => _vibrationEnabled;
 
+  bool _isDarkMode = false;
+  bool get isDarkMode => _isDarkMode;
+
   // Real-time Scanning Cooldown States
   bool _isCoolingDown = false;
   bool get isCoolingDown => _isCoolingDown;
@@ -66,6 +69,7 @@ class BarcodeViewModel extends ChangeNotifier {
     _scanDelayMs = _prefs.getDouble('scan_delay_ms') ?? 500.0;
     _soundEnabled = _prefs.getBool('sound_enabled') ?? true;
     _vibrationEnabled = _prefs.getBool('vibration_enabled') ?? true;
+    _isDarkMode = _prefs.getBool('dark_mode_enabled') ?? false;
 
     await refreshHistory();
     notifyListeners();
@@ -103,6 +107,12 @@ class BarcodeViewModel extends ChangeNotifier {
   Future<void> updateVibrationEnabled(bool enabled) async {
     _vibrationEnabled = enabled;
     await _prefs.setBool('vibration_enabled', enabled);
+    notifyListeners();
+  }
+
+  Future<void> updateDarkMode(bool enabled) async {
+    _isDarkMode = enabled;
+    await _prefs.setBool('dark_mode_enabled', enabled);
     notifyListeners();
   }
 

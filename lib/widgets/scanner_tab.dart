@@ -206,7 +206,7 @@ class _ScannerTabState extends State<ScannerTab> with SingleTickerProviderStateM
                               ),
                             ),
                             const SizedBox(height: 16.0),
-                            const Text(
+                            Text(
                               'PREVENTING DUPLICATE',
                               style: TextStyle(
                                 color: polishError,
@@ -218,7 +218,7 @@ class _ScannerTabState extends State<ScannerTab> with SingleTickerProviderStateM
                             const SizedBox(height: 4.0),
                             Text(
                               'Cooldown active: ${(viewModel.scanDelayMs * viewModel.cooldownProgress / 1000.0).toStringAsFixed(1)}s',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: polishOnSurface,
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.bold,
@@ -255,7 +255,7 @@ class _ScannerTabState extends State<ScannerTab> with SingleTickerProviderStateM
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       alignment: Alignment.center,
-                      child: const Icon(
+                      child: Icon(
                         Icons.qr_code,
                         color: polishOnPrimaryContainer,
                         size: 24.0,
@@ -268,7 +268,7 @@ class _ScannerTabState extends State<ScannerTab> with SingleTickerProviderStateM
                         children: [
                           Text(
                             'LAST SCANNED • ${viewModel.lastScannedFormat ?? "FORMAT"}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: polishPrimary,
                               fontWeight: FontWeight.bold,
                               fontSize: 10.0,
@@ -278,7 +278,7 @@ class _ScannerTabState extends State<ScannerTab> with SingleTickerProviderStateM
                           const SizedBox(height: 2.0),
                           Text(
                             viewModel.lastScannedValue ?? '',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: polishOnSurface,
                               fontWeight: FontWeight.bold,
                               fontSize: 16.0,
@@ -288,7 +288,7 @@ class _ScannerTabState extends State<ScannerTab> with SingleTickerProviderStateM
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 4.0),
-                          const Text(
+                          Text(
                             'Sent to companion in real-time',
                             style: TextStyle(
                               color: polishOnSurfaceVariant,

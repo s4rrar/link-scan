@@ -12,7 +12,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Settings',
           style: TextStyle(
             fontWeight: FontWeight.bold,
@@ -23,7 +23,7 @@ class SettingsScreen extends StatelessWidget {
         backgroundColor: polishBackground,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: polishOnBackground),
+          icon: Icon(Icons.arrow_back, color: polishOnBackground),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),

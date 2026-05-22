@@ -50,7 +50,7 @@ class _SettingsTabState extends State<SettingsTab> {
     return ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
-        const Text(
+        Text(
           'COMPANION CONFIGURATION',
           style: TextStyle(
             color: polishPrimary,
@@ -60,7 +60,7 @@ class _SettingsTabState extends State<SettingsTab> {
           ),
         ),
         const SizedBox(height: 4.0),
-        const Text(
+        Text(
           'Manage your wireless settings, transmission ports, haptic feel, and hardware simulation delays.',
           style: TextStyle(
             color: polishOnSurfaceVariant,
@@ -82,7 +82,7 @@ class _SettingsTabState extends State<SettingsTab> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'PC SERVER IP ADDRESS',
                   style: TextStyle(
                     fontSize: 12.0,
@@ -95,7 +95,7 @@ class _SettingsTabState extends State<SettingsTab> {
                 TextField(
                   controller: _ipController,
                   keyboardType: TextInputType.text,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: polishOnSurface,
                     fontSize: 16.0,
                     fontFamily: 'monospace',
@@ -103,7 +103,7 @@ class _SettingsTabState extends State<SettingsTab> {
                   decoration: InputDecoration(
                     hintText: 'e.g. 192.168.1.15',
                     focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: polishPrimary),
+                      borderSide: BorderSide(color: polishPrimary),
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     enabledBorder: OutlineInputBorder(
@@ -114,7 +114,7 @@ class _SettingsTabState extends State<SettingsTab> {
                   ),
                 ),
                 const SizedBox(height: 16.0),
-                const Text(
+                Text(
                   'SERVER PORT',
                   style: TextStyle(
                     fontSize: 12.0,
@@ -127,7 +127,7 @@ class _SettingsTabState extends State<SettingsTab> {
                 TextField(
                   controller: _portController,
                   keyboardType: TextInputType.number,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: polishOnSurface,
                     fontSize: 16.0,
                     fontFamily: 'monospace',
@@ -135,7 +135,7 @@ class _SettingsTabState extends State<SettingsTab> {
                   decoration: InputDecoration(
                     hintText: 'e.g. 8080',
                     focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: polishPrimary),
+                      borderSide: BorderSide(color: polishPrimary),
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     enabledBorder: OutlineInputBorder(
@@ -212,7 +212,7 @@ class _SettingsTabState extends State<SettingsTab> {
                         const SizedBox(height: 6.0),
                         Text(
                           viewModel.connectionStatusMessage ?? '',
-                          style: const TextStyle(fontSize: 12.0, color: polishOnSurface, height: 1.4),
+                          style: TextStyle(fontSize: 12.0, color: polishOnSurface, height: 1.4),
                         ),
                       ],
                     ),
@@ -240,7 +240,7 @@ class _SettingsTabState extends State<SettingsTab> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'ANTI-DUPLICATE SCAN COOLDOWN',
                       style: TextStyle(
                         fontSize: 12.0,
@@ -251,7 +251,7 @@ class _SettingsTabState extends State<SettingsTab> {
                     ),
                     Text(
                       '${(viewModel.scanDelayMs / 1000.0).toStringAsFixed(1)}s',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: polishPrimary,
                         fontWeight: FontWeight.bold,
                         fontSize: 14.0,
@@ -260,7 +260,7 @@ class _SettingsTabState extends State<SettingsTab> {
                   ],
                 ),
                 const SizedBox(height: 4.0),
-                const Text(
+                Text(
                   'Configured delay window between scanned codes. Stops accidental scan trigger noise.',
                   style: TextStyle(color: polishOnSurfaceVariant, fontSize: 11.0),
                 ),
@@ -295,7 +295,7 @@ class _SettingsTabState extends State<SettingsTab> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'HAPTIC FEEDBACK PREFERENCES',
                   style: TextStyle(
                     fontSize: 12.0,
@@ -319,7 +319,7 @@ class _SettingsTabState extends State<SettingsTab> {
                             size: 20.0,
                           ),
                           const SizedBox(width: 12.0),
-                          const Expanded(
+                          Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -359,13 +359,13 @@ class _SettingsTabState extends State<SettingsTab> {
                     Expanded(
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.vibration,
                             color: polishOnSurfaceVariant,
                             size: 20.0,
                           ),
                           const SizedBox(width: 12.0),
-                          const Expanded(
+                          Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -389,6 +389,77 @@ class _SettingsTabState extends State<SettingsTab> {
                       activeThumbColor: Colors.white,
                       onChanged: (newValue) {
                         viewModel.updateVibrationEnabled(newValue);
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16.0),
+
+        // Appearance / Theme preference card
+        Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24.0),
+            side: BorderSide(color: polishOutline.withOpacity(0.4), width: 1.0),
+          ),
+          color: polishSurface,
+          elevation: 0,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'APPEARANCE PREFERENCES',
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.bold,
+                    color: polishPrimary,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+
+                // Dark Theme Switch
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Icon(
+                            viewModel.isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                            color: polishOnSurfaceVariant,
+                            size: 20.0,
+                          ),
+                          const SizedBox(width: 12.0),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Dark Theme Mode',
+                                  style: TextStyle(color: polishOnSurface, fontSize: 14.0, fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  'Switch between light and dark visual aesthetics',
+                                  style: TextStyle(color: polishOnSurfaceVariant, fontSize: 11.0),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Switch(
+                      value: viewModel.isDarkMode,
+                      activeTrackColor: polishPrimary,
+                      activeThumbColor: Colors.white,
+                      onChanged: (newValue) {
+                        viewModel.updateDarkMode(newValue);
                       },
                     ),
                   ],

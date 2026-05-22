@@ -10,7 +10,7 @@ class ViewfinderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     const overlayColor = Color(0x77000000);
-    const strokeColor = polishPrimary;
+    final strokeColor = polishPrimary;
 
     final viewfinderWidth = size.width * 0.75;
     final viewfinderHeight = size.height * 0.42;

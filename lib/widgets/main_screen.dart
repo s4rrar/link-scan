@@ -22,7 +22,8 @@ enum AppTab {
 }
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final BarcodeViewModel viewModel;
+  const MainScreen({super.key, required this.viewModel});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -30,24 +31,11 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   AppTab _selectedTab = AppTab.scanner;
-  late final BarcodeViewModel _viewModel;
-
-  @override
-  void initState() {
-    super.initState();
-    _viewModel = BarcodeViewModel();
-  }
-
-  @override
-  void dispose() {
-    _viewModel.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: _viewModel,
+      listenable: widget.viewModel,
       builder: (context, _) {
         return Scaffold(
           appBar: PreferredSize(
@@ -63,12 +51,12 @@ class _MainScreenState extends State<MainScreen> {
                         Container(
                           width: 40.0,
                           height: 40.0,
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: polishPrimaryContainer,
                           ),
                           alignment: Alignment.center,
-                          child: const Icon(
+                          child: Icon(
                             Icons.qr_code_scanner,
                             color: polishOnPrimaryContainer,
                             size: 22.0,
@@ -79,7 +67,7 @@ class _MainScreenState extends State<MainScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
+                            Text(
                               'LinkScan',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -99,8 +87,8 @@ class _MainScreenState extends State<MainScreen> {
                                 ),
                                 const SizedBox(width: 6.0),
                                 Text(
-                                  'PC Connected: ${_viewModel.serverIp}',
-                                  style: const TextStyle(
+                                  'PC Connected: ${widget.viewModel.serverIp}',
+                                  style: TextStyle(
                                     fontSize: 11.0,
                                     color: polishOnSurfaceVariant,
                                   ),
@@ -112,7 +100,7 @@ class _MainScreenState extends State<MainScreen> {
                       ],
                     ),
                     IconButton(
-                      icon: const Icon(Icons.settings, color: polishOnSurfaceVariant),
+                      icon: Icon(Icons.settings, color: polishOnSurfaceVariant),
                       style: IconButton.styleFrom(
                         backgroundColor: polishSurfaceVariant.withOpacity(0.5),
                         minimumSize: const Size(40.0, 40.0),
@@ -120,7 +108,7 @@ class _MainScreenState extends State<MainScreen> {
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => SettingsScreen(viewModel: _viewModel),
+                            builder: (context) => SettingsScreen(viewModel: widget.viewModel),
                           ),
                         );
                       },
@@ -133,8 +121,8 @@ class _MainScreenState extends State<MainScreen> {
           body: IndexedStack(
             index: _selectedTab.index,
             children: [
-              ScannerTab(viewModel: _viewModel),
-              HistoryTab(viewModel: _viewModel),
+              ScannerTab(viewModel: widget.viewModel),
+              HistoryTab(viewModel: widget.viewModel),
               CompanionTab(),
               const AboutTab(),
             ],
