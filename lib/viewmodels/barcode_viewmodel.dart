@@ -6,6 +6,8 @@ import '../models/scan_item.dart';
 import '../database/db_helper.dart';
 import '../network/api_client.dart';
 
+enum ConnectionStatus { connected, failed, ready }
+
 class BarcodeViewModel extends ChangeNotifier {
   late SharedPreferences _prefs;
   final _apiClient = ApiClient();
@@ -43,12 +45,19 @@ class BarcodeViewModel extends ChangeNotifier {
   String? _lastScannedFormat;
   String? get lastScannedFormat => _lastScannedFormat;
 
+  // Connection status
+  ConnectionStatus _connectionStatus = ConnectionStatus.ready;
+  ConnectionStatus get connectionStatus => _connectionStatus;
+
   // Test ping response messages
   String? _connectionStatusMessage;
   String? get connectionStatusMessage => _connectionStatusMessage;
 
   bool _isTestingConnection = false;
   bool get isTestingConnection => _isTestingConnection;
+
+  Timer? _pingTimer;
+  Timer? _failureTimer;
 
   // Scan history list
   List<ScanItem> _scanHistory = [];
@@ -72,7 +81,35 @@ class BarcodeViewModel extends ChangeNotifier {
     _isDarkMode = _prefs.getBool('dark_mode_enabled') ?? false;
 
     await refreshHistory();
+    _startPeriodicPing();
     notifyListeners();
+  }
+
+  void _startPeriodicPing() {
+    _pingTimer?.cancel();
+    _ping();
+    _pingTimer = Timer.periodic(const Duration(seconds: 5), (_) => _ping());
+  }
+
+  Future<void> _ping() async {
+    try {
+      await _apiClient.pingServer(ipAddress: _serverIp, port: _serverPort);
+      _failureTimer?.cancel();
+      if (_connectionStatus != ConnectionStatus.connected) {
+        _connectionStatus = ConnectionStatus.connected;
+        notifyListeners();
+      }
+    } catch (_) {
+      if (_connectionStatus == ConnectionStatus.connected) {
+        _connectionStatus = ConnectionStatus.failed;
+        notifyListeners();
+        _failureTimer?.cancel();
+        _failureTimer = Timer(const Duration(seconds: 3), () {
+          _connectionStatus = ConnectionStatus.ready;
+          notifyListeners();
+        });
+      }
+    }
   }
 
   Future<void> refreshHistory() async {
@@ -134,8 +171,18 @@ class BarcodeViewModel extends ChangeNotifier {
     try {
       await _apiClient.pingServer(ipAddress: _serverIp, port: _serverPort);
       _connectionStatusMessage = 'Connected! Companion PC server is active.';
+      _failureTimer?.cancel();
+      _connectionStatus = ConnectionStatus.connected;
     } catch (e) {
       _connectionStatusMessage = 'Ping failed: ${e.toString()}\nEnsure your companion PC script is running on IP: $_serverIp, port: $_serverPort, and that both devices are connected to the exact same Wi-Fi SSID network.';
+      if (_connectionStatus != ConnectionStatus.failed) {
+        _connectionStatus = ConnectionStatus.failed;
+      }
+      _failureTimer?.cancel();
+      _failureTimer = Timer(const Duration(seconds: 3), () {
+        _connectionStatus = ConnectionStatus.ready;
+        notifyListeners();
+      });
     } finally {
       _isTestingConnection = false;
       notifyListeners();
@@ -229,6 +276,8 @@ class BarcodeViewModel extends ChangeNotifier {
   @override
   void dispose() {
     _cooldownTimer?.cancel();
+    _pingTimer?.cancel();
+    _failureTimer?.cancel();
     super.dispose();
   }
 }

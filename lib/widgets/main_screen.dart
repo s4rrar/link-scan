@@ -7,6 +7,18 @@ import 'companion_tab.dart';
 import 'about_tab.dart';
 import 'settings_screen.dart';
 
+final Map<ConnectionStatus, Color> _statusDotColors = {
+  ConnectionStatus.connected: const Color(0xFF4CAF50),
+  ConnectionStatus.failed: Colors.red,
+  ConnectionStatus.ready: Colors.blue,
+};
+
+final Map<ConnectionStatus, String> _statusLabels = {
+  ConnectionStatus.connected: 'PC Connected: ',
+  ConnectionStatus.failed: 'Failed to connect',
+  ConnectionStatus.ready: 'Ready to connect',
+};
+
 
 enum AppTab {
   scanner('Scanner', Icons.qr_code_scanner_outlined, Icons.qr_code_scanner),
@@ -83,14 +95,16 @@ class _MainScreenState extends State<MainScreen> {
                                 Container(
                                   width: 8.0,
                                   height: 8.0,
-                                  decoration: const BoxDecoration(
+                                  decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Color(0xFF4CAF50),
+                                    color: _statusDotColors[widget.viewModel.connectionStatus]!,
                                   ),
                                 ),
                                 const SizedBox(width: 6.0),
                                 Text(
-                                  'PC Connected: ${widget.viewModel.serverIp}',
+                                  widget.viewModel.connectionStatus == ConnectionStatus.connected
+                                      ? '${_statusLabels[widget.viewModel.connectionStatus]}${widget.viewModel.serverIp}'
+                                      : _statusLabels[widget.viewModel.connectionStatus]!,
                                   style: TextStyle(
                                     fontSize: 11.0,
                                     color: polishOnSurfaceVariant,
