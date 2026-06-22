@@ -30,13 +30,14 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  AppTab _selectedTab = AppTab.scanner;
+  final ValueNotifier<AppTab> _selectedTab = ValueNotifier<AppTab>(AppTab.scanner);
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: widget.viewModel,
+      listenable: Listenable.merge([widget.viewModel, _selectedTab]),
       builder: (context, _) {
+        final currentTab = _selectedTab.value;
         return Scaffold(
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(64.0),
@@ -121,9 +122,9 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
           body: IndexedStack(
-            index: _selectedTab.index,
+            index: currentTab.index,
             children: [
-              ScannerTab(viewModel: widget.viewModel),
+              ScannerTab(viewModel: widget.viewModel, isActive: currentTab == AppTab.scanner),
               HistoryTab(viewModel: widget.viewModel),
               CompanionTab(),
               const AboutTab(),
@@ -150,15 +151,13 @@ class _MainScreenState extends State<MainScreen> {
               ),
               child: NavigationBar(
                 backgroundColor: polishSurfaceContainerLow,
-                selectedIndex: _selectedTab.index,
+                selectedIndex: currentTab.index,
                 onDestinationSelected: (index) {
-                  setState(() {
-                    _selectedTab = AppTab.values[index];
-                  });
+                  _selectedTab.value = AppTab.values[index];
                 },
                 indicatorColor: polishPrimaryContainer,
                 destinations: AppTab.values.map((tab) {
-                  final isSelected = _selectedTab == tab;
+                  final isSelected = currentTab == tab;
                   return NavigationDestination(
                     icon: Icon(isSelected ? tab.iconSelected : tab.iconUnselected),
                     label: tab.title,

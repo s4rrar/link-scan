@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import '../theme/app_theme.dart';
 import '../viewmodels/barcode_viewmodel.dart';
 import 'camera_permission_request_screen.dart';
@@ -7,31 +8,74 @@ import 'viewfinder_painter.dart';
 
 class ScannerTab extends StatefulWidget {
   final BarcodeViewModel viewModel;
+  final bool isActive;
 
-  const ScannerTab({super.key, required this.viewModel});
+  const ScannerTab({super.key, required this.viewModel, this.isActive = true});
 
   @override
   State<ScannerTab> createState() => _ScannerTabState();
 }
 
-class _ScannerTabState extends State<ScannerTab> with SingleTickerProviderStateMixin {
+class _ScannerTabState extends State<ScannerTab> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late final AnimationController _laserController;
   final MobileScannerController _cameraController = MobileScannerController();
+  bool _isScreenOn = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _laserController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
+    _updateCameraAndWakelock();
+  }
+
+  @override
+  void didUpdateWidget(ScannerTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isActive != widget.isActive) {
+      _updateCameraAndWakelock();
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
+      if (_isScreenOn) {
+        _cameraController.stop();
+        WakelockPlus.disable();
+        _isScreenOn = false;
+      }
+    } else if (state == AppLifecycleState.resumed && widget.isActive) {
+      _cameraController.start();
+      if (!_isScreenOn) {
+        WakelockPlus.enable();
+        _isScreenOn = true;
+      }
+    }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _laserController.dispose();
     _cameraController.dispose();
+    WakelockPlus.disable();
     super.dispose();
+  }
+
+  void _updateCameraAndWakelock() {
+    if (widget.isActive) {
+      _cameraController.start();
+      WakelockPlus.enable();
+      _isScreenOn = true;
+    } else {
+      _cameraController.stop();
+      WakelockPlus.disable();
+      _isScreenOn = false;
+    }
   }
 
   String getBarcodeFormatName(BarcodeFormat format) {

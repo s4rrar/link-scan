@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppThemeState {
   static bool isDark = false;
@@ -87,7 +88,7 @@ final ThemeData appTheme = ThemeData(
     errorContainer: _lightErrorContainer,
   ),
   scaffoldBackgroundColor: _lightBackground,
-  fontFamily: 'Roboto',
+  textTheme: GoogleFonts.publicSansTextTheme(),
 );
 
 final ThemeData darkAppTheme = ThemeData(
@@ -113,6 +114,6 @@ final ThemeData darkAppTheme = ThemeData(
     errorContainer: _darkErrorContainer,
   ),
   scaffoldBackgroundColor: _darkBackground,
-  fontFamily: 'Roboto',
+  textTheme: GoogleFonts.publicSansTextTheme(Typography.whiteMountainView),
 );
 
