@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_styles.dart';
 import '../viewmodels/barcode_viewmodel.dart';
 import 'scanner_tab.dart';
 import 'history_tab.dart';
@@ -50,133 +51,132 @@ class _MainScreenState extends State<MainScreen> {
       listenable: Listenable.merge([widget.viewModel, _selectedTab]),
       builder: (context, _) {
         final currentTab = _selectedTab.value;
-        return Scaffold(
-          appBar: PreferredSize(
-            preferredSize: const Size.fromHeight(64.0),
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 40.0,
-                          height: 40.0,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          alignment: Alignment.center,
-                          child: ClipOval(
-                            child: Image.asset(
-                              'logo/logo.png',
-                              width: 40.0,
-                              height: 40.0,
-                              fit: BoxFit.cover,
+        final isDark = widget.viewModel.isDarkMode;
+        final primaryColor = polishPrimary;
+
+        return GlassBackground(
+          isDark: isDark,
+          primaryColor: primaryColor,
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: PreferredSize(
+              preferredSize: const Size.fromHeight(64.0),
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 40.0,
+                            height: 40.0,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: 12.0),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'LinkScan Pro',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16.0,
-                                color: polishOnBackground,
+                            alignment: Alignment.center,
+                            child: ClipOval(
+                              child: Image.asset(
+                                'logo/logo.png',
+                                width: 40.0,
+                                height: 40.0,
+                                fit: BoxFit.cover,
                               ),
                             ),
-                            Row(
-                              children: [
-                                Container(
-                                  width: 8.0,
-                                  height: 8.0,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: _statusDotColors[widget.viewModel.connectionStatus]!,
-                                  ),
-                                ),
-                                const SizedBox(width: 6.0),
-                                Text(
-                                  widget.viewModel.connectionStatus == ConnectionStatus.connected
-                                      ? '${_statusLabels[widget.viewModel.connectionStatus]}${widget.viewModel.serverIp}'
-                                      : _statusLabels[widget.viewModel.connectionStatus]!,
-                                  style: TextStyle(
-                                    fontSize: 11.0,
-                                    color: polishOnSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.settings, color: polishOnSurfaceVariant),
-                      style: IconButton.styleFrom(
-                        backgroundColor: polishSurfaceVariant.withOpacity(0.5),
-                        minimumSize: const Size(40.0, 40.0),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => SettingsScreen(viewModel: widget.viewModel),
                           ),
-                        );
-                      },
-                    ),
-                  ],
+                          const SizedBox(width: 12.0),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'LinkScan Pro',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16.0,
+                                  color: polishOnBackground,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 8.0,
+                                    height: 8.0,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: widget.viewModel.connectionStatus == ConnectionStatus.ready
+                                          ? primaryColor
+                                          : _statusDotColors[widget.viewModel.connectionStatus]!,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6.0),
+                                  Text(
+                                    widget.viewModel.connectionStatus == ConnectionStatus.connected
+                                        ? '${_statusLabels[widget.viewModel.connectionStatus]}${widget.viewModel.serverIp}'
+                                        : _statusLabels[widget.viewModel.connectionStatus]!,
+                                    style: TextStyle(
+                                      fontSize: 11.0,
+                                      color: polishOnSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.settings, color: polishOnSurfaceVariant),
+                        style: IconButton.styleFrom(
+                          backgroundColor: polishSurfaceVariant.withOpacity(0.5),
+                          minimumSize: const Size(40.0, 40.0),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => SettingsScreen(viewModel: widget.viewModel),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          body: IndexedStack(
-            index: currentTab.index,
-            children: [
-              ScannerTab(viewModel: widget.viewModel, isActive: currentTab == AppTab.scanner),
-              HistoryTab(viewModel: widget.viewModel),
-              CompanionTab(),
-              const AboutTab(),
-            ],
-          ),
-          bottomNavigationBar: Container(
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(32.0),
-                topRight: Radius.circular(32.0),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 8.0,
-                  offset: const Offset(0, -2),
-                ),
+            body: IndexedStack(
+              index: currentTab.index,
+              children: [
+                ScannerTab(viewModel: widget.viewModel, isActive: currentTab == AppTab.scanner),
+                HistoryTab(viewModel: widget.viewModel),
+                CompanionTab(viewModel: widget.viewModel),
+                AboutTab(viewModel: widget.viewModel),
               ],
             ),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(32.0),
-                topRight: Radius.circular(32.0),
-              ),
-              child: NavigationBar(
-                backgroundColor: polishSurfaceContainerLow,
-                selectedIndex: currentTab.index,
-                onDestinationSelected: (index) {
-                  _selectedTab.value = AppTab.values[index];
-                },
-                indicatorColor: polishPrimaryContainer,
-                destinations: AppTab.values.map((tab) {
-                  final isSelected = currentTab == tab;
-                  return NavigationDestination(
-                    icon: Icon(isSelected ? tab.iconSelected : tab.iconUnselected),
-                    label: tab.title,
-                  );
-                }).toList(),
+            bottomNavigationBar: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: GlassContainer(
+                  isDark: isDark,
+                  primaryColor: primaryColor,
+                  borderRadius: AppStyles.radiusLarge,
+                  child: NavigationBar(
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    selectedIndex: currentTab.index,
+                    onDestinationSelected: (index) {
+                      _selectedTab.value = AppTab.values[index];
+                    },
+                    destinations: AppTab.values.map((tab) {
+                      final isSelected = currentTab == tab;
+                      return NavigationDestination(
+                        icon: Icon(isSelected ? tab.iconSelected : tab.iconUnselected),
+                        label: tab.title,
+                      );
+                    }).toList(),
+                  ),
+                ),
               ),
             ),
           ),

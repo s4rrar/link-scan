@@ -19,6 +19,7 @@ class MyApp extends StatelessWidget {
       listenable: viewModel,
       builder: (context, _) {
         AppThemeState.isDark = viewModel.isDarkMode;
+        AppThemeState.primaryColorOption = viewModel.primaryColor;
         return MaterialApp(
           title: 'LinkScan Pro',
           theme: appTheme,

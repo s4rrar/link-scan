@@ -1,4 +1,4 @@
-package com.linkscan.pro
+package com.linkscan.org
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -7,7 +7,7 @@ import android.media.AudioManager
 import android.media.ToneGenerator
 
 class MainActivity : FlutterActivity() {
-    private val CHANNEL = "com.linkscan.pro/beep"
+    private val CHANNEL = "com.linkscan.org/beep"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)

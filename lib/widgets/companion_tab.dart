@@ -7,9 +7,12 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_styles.dart';
+import '../viewmodels/barcode_viewmodel.dart';
 
 class CompanionTab extends StatefulWidget {
-  const CompanionTab({super.key});
+  final BarcodeViewModel viewModel;
+  const CompanionTab({super.key, required this.viewModel});
 
   @override
   State<CompanionTab> createState() => _CompanionTabState();
@@ -288,23 +291,37 @@ class _CompanionTabState extends State<CompanionTab> {
 
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Companion?'),
-        content: const Text(
-          'Are you sure you want to remove the downloaded LinkScanPC executable? You will need to re-download it to launch it from the app again.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+      builder: (context) {
+        final isDark = AppThemeState.isDark;
+        return BackdropFilter(
+          filter: AppStyles.glassBlurFilter,
+          child: AlertDialog(
+            backgroundColor: (isDark ? Colors.black : Colors.white).withOpacity(0.85),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppStyles.radiusLarge),
+              side: BorderSide(
+                color: (isDark ? Colors.white : polishPrimary).withOpacity(0.2),
+                width: 1.2,
+              ),
+            ),
+            title: const Text('Delete Companion?'),
+            content: const Text(
+              'Are you sure you want to remove the downloaded LinkScanPC executable? You will need to re-download it to launch it from the app again.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Delete'),
+              ),
+            ],
           ),
-          TextButton(
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+        );
+      },
     );
 
     if (confirm == true) {
@@ -352,220 +369,221 @@ class _CompanionTabState extends State<CompanionTab> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(16.0),
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return ListenableBuilder(
+      listenable: widget.viewModel,
+      builder: (context, _) {
+        return ListView(
+          padding: const EdgeInsets.all(16.0),
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'DESKTOP COMPANION SETUP',
-                    style: TextStyle(
-                      color: polishPrimary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14.0,
-                      letterSpacing: 1.0,
-                    ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'DESKTOP COMPANION SETUP',
+                        style: TextStyle(
+                          color: polishPrimary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14.0,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                      const SizedBox(height: 4.0),
+                      Text(
+                        'Sync scans instantly onto your computer with LinkScanPC server.',
+                        style: TextStyle(
+                          color: polishOnSurfaceVariant,
+                          fontSize: 13.0,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4.0),
-                  Text(
-                    'Sync scans instantly onto your computer with LinkScanPC server.',
-                    style: TextStyle(
-                      color: polishOnSurfaceVariant,
-                      fontSize: 13.0,
-                    ),
+                ),
+                if (_isWindows && _exeExists && !_isRunning)
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                    tooltip: 'Delete Executable',
+                    onPressed: _deleteExe,
                   ),
-                ],
-              ),
+              ],
             ),
-            if (_isWindows && _exeExists && !_isRunning)
-              IconButton(
-                icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                tooltip: 'Delete Executable',
-                onPressed: _deleteExe,
-              ),
+            const SizedBox(height: 16.0),
+
+            if (_isWindows) ...[
+              // Windows Interactive Section
+              _buildWindowsControlPanel(),
+              const SizedBox(height: 16.0),
+              _buildTerminalLogsView(),
+              const SizedBox(height: 20.0),
+              _buildSettingsInformationCard(),
+            ] else ...[
+              // Fallback instructions for non-Windows (Android, iOS, Web, macOS, Linux)
+              _buildNonWindowsCard(),
+            ],
+
+            const SizedBox(height: 16.0),
+            _buildStepGuideCard(),
           ],
-        ),
-        const SizedBox(height: 16.0),
-
-        if (_isWindows) ...[
-          // Windows Interactive Section
-          _buildWindowsControlPanel(),
-          const SizedBox(height: 16.0),
-          _buildTerminalLogsView(),
-          const SizedBox(height: 20.0),
-          _buildSettingsInformationCard(),
-        ] else ...[
-          // Fallback instructions for non-Windows (Android, iOS, Web, macOS, Linux)
-          _buildNonWindowsCard(),
-        ],
-
-        const SizedBox(height: 16.0),
-        _buildStepGuideCard(),
-      ],
+        );
+      },
     );
   }
 
   Widget _buildWindowsControlPanel() {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24.0),
-        side: BorderSide(color: polishOutline.withOpacity(0.4), width: 1.0),
-      ),
-      color: polishSurface,
-      elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.laptop_windows_rounded,
-                  color: polishPrimary,
-                  size: 24.0,
-                ),
-                const SizedBox(width: 10.0),
-                const Text(
-                  'Windows App Integration',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12.0),
-            Text(
-              'Manage your local LinkScanPC receiver directly from this app window. No command prompt required.',
-              style: TextStyle(
-                color: polishOnSurfaceVariant,
-                fontSize: 13.0,
-                height: 1.4,
+    final isDark = AppThemeState.isDark;
+    return GlassContainer(
+      isDark: isDark,
+      primaryColor: polishPrimary,
+      borderRadius: AppStyles.radiusLarge,
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.laptop_windows_rounded,
+                color: polishPrimary,
+                size: 24.0,
               ),
+              const SizedBox(width: 10.0),
+              const Text(
+                'Windows App Integration',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12.0),
+          Text(
+            'Manage your local LinkScanPC receiver directly from this app window. No command prompt required.',
+            style: TextStyle(
+              color: polishOnSurfaceVariant,
+              fontSize: 13.0,
+              height: 1.4,
             ),
-            const SizedBox(height: 20.0),
+          ),
+          const SizedBox(height: 20.0),
 
-            if (!_exeExists) ...[
-              // Download section
-              if (_isDownloading) ...[
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _downloadStatusText,
-                          style: TextStyle(
-                            color: polishPrimary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13.0,
-                          ),
-                        ),
-                        Text(
-                          '${(_downloadProgress * 100).toStringAsFixed(0)}%',
-                          style: TextStyle(
-                            color: polishPrimary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13.0,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8.0),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10.0),
-                      child: LinearProgressIndicator(
-                        value: _downloadProgress > 0 ? _downloadProgress : null,
-                        minHeight: 8.0,
-                        backgroundColor: polishPrimaryContainer.withOpacity(
-                          0.3,
-                        ),
-                        color: polishPrimary,
-                      ),
-                    ),
-                  ],
-                ),
-              ] else ...[
-                SizedBox(
-                  width: double.infinity,
-                  height: 48.0,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: polishPrimary,
-                      foregroundColor: polishOnPrimary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14.0),
-                      ),
-                      elevation: 0,
-                    ),
-                    onPressed: _downloadExe,
-                    icon: const Icon(Icons.download, size: 20.0),
-                    label: const Text(
-                      'Download LinkScanPC.exe',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-              ],
-            ] else ...[
-              // Action buttons to start / stop / browse
-              Row(
+          if (!_exeExists) ...[
+            // Download section
+            if (_isDownloading) ...[
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 46.0,
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _isRunning
-                              ? Colors.redAccent
-                              : Colors.teal,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          elevation: 0,
-                        ),
-                        onPressed: _isRunning ? _stopProcess : _startProcess,
-                        icon: Icon(
-                          _isRunning ? Icons.stop : Icons.play_arrow,
-                          size: 20.0,
-                        ),
-                        label: Text(
-                          _isRunning ? 'Stop Companion' : 'Start Companion',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13.0,
-                          ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _downloadStatusText,
+                        style: TextStyle(
+                          color: polishPrimary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13.0,
                         ),
                       ),
-                    ),
+                      Text(
+                        '${(_downloadProgress * 100).toStringAsFixed(0)}%',
+                        style: TextStyle(
+                          color: polishPrimary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13.0,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 10.0),
-                  Container(
-                    height: 46.0,
-                    decoration: BoxDecoration(
-                      color: polishSurfaceVariant.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(12.0),
-                      border: Border.all(
-                        color: polishOutline.withOpacity(0.2),
-                        width: 1.0,
+                  const SizedBox(height: 8.0),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10.0),
+                    child: LinearProgressIndicator(
+                      value: _downloadProgress > 0 ? _downloadProgress : null,
+                      minHeight: 8.0,
+                      backgroundColor: polishPrimaryContainer.withOpacity(
+                        0.3,
                       ),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(Icons.folder_open),
-                      tooltip: 'Open Executable Location',
-                      onPressed: _openLocation,
+                      color: polishPrimary,
                     ),
                   ),
                 ],
               ),
+            ] else ...[
+              SizedBox(
+                width: double.infinity,
+                height: 48.0,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: polishPrimary,
+                    foregroundColor: polishOnPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14.0),
+                    ),
+                    elevation: 0,
+                  ),
+                  onPressed: _downloadExe,
+                  icon: const Icon(Icons.download, size: 20.0),
+                  label: const Text(
+                    'Download LinkScanPC.exe',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
             ],
+          ] else ...[
+            // Action buttons to start / stop / browse
+            Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 46.0,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _isRunning
+                            ? Colors.redAccent
+                            : Colors.teal,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        elevation: 0,
+                      ),
+                      onPressed: _isRunning ? _stopProcess : _startProcess,
+                      icon: Icon(
+                        _isRunning ? Icons.stop : Icons.play_arrow,
+                        size: 20.0,
+                      ),
+                      label: Text(
+                        _isRunning ? 'Stop Companion' : 'Start Companion',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10.0),
+                Container(
+                  height: 46.0,
+                  decoration: BoxDecoration(
+                    color: polishSurfaceVariant.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(12.0),
+                    border: Border.all(
+                      color: polishOutline.withOpacity(0.2),
+                      width: 1.0,
+                    ),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.folder_open),
+                    tooltip: 'Open Executable Location',
+                    onPressed: _openLocation,
+                  ),
+                ),
+              ],
+            ),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -729,151 +747,139 @@ class _CompanionTabState extends State<CompanionTab> {
   }
 
   Widget _buildSettingsInformationCard() {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.0),
-        side: BorderSide(color: polishOutline.withOpacity(0.3), width: 1.0),
-      ),
-      color: polishSurfaceVariant.withOpacity(0.15),
-      elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '💡 Configuration Tips',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0),
+    final isDark = AppThemeState.isDark;
+    return GlassContainer(
+      isDark: isDark,
+      primaryColor: polishPrimary,
+      borderRadius: AppStyles.radiusMedium,
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '💡 Configuration Tips',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0),
+          ),
+          const SizedBox(height: 6.0),
+          Text(
+            '• By default, LinkScanPC listens on port 8080.\n'
+            '• Auto-typing config and preferences are stored locally at:\n'
+            '  %USERPROFILE%\\.linkscanpc\\settings.json\n'
+            '• The server runs safely in your background tray context.',
+            style: TextStyle(
+              color: polishOnSurfaceVariant,
+              fontSize: 12.0,
+              height: 1.6,
             ),
-            const SizedBox(height: 6.0),
-            Text(
-              '• By default, LinkScanPC listens on port 8080.\n'
-              '• Auto-typing config and preferences are stored locally at:\n'
-              '  %USERPROFILE%\\.linkscanpc\\settings.json\n'
-              '• The server runs safely in your background tray context.',
-              style: TextStyle(
-                color: polishOnSurfaceVariant,
-                fontSize: 12.0,
-                height: 1.6,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildNonWindowsCard() {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24.0),
-        side: BorderSide(color: polishOutline.withOpacity(0.4), width: 1.0),
-      ),
-      color: polishSurface,
-      elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.devices, color: polishPrimary, size: 24.0),
-                const SizedBox(width: 10.0),
-                const Text(
-                  'LinkScanPC Companion',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10.0),
-            Text(
-              'The compiled LinkScanPC executable runs directly on Windows. For non-Windows platforms, or to set up manually, you can download the latest releases from GitHub.',
-              style: TextStyle(
-                color: polishOnSurfaceVariant,
-                fontSize: 12.5,
-                height: 1.5,
+    final isDark = AppThemeState.isDark;
+    return GlassContainer(
+      isDark: isDark,
+      primaryColor: polishPrimary,
+      borderRadius: AppStyles.radiusLarge,
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.devices, color: polishPrimary, size: 24.0),
+              const SizedBox(width: 10.0),
+              const Text(
+                'LinkScanPC Companion',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
               ),
+            ],
+          ),
+          const SizedBox(height: 10.0),
+          Text(
+            'The compiled LinkScanPC executable runs directly on Windows. For non-Windows platforms, or to set up manually, you can download the latest releases from GitHub.',
+            style: TextStyle(
+              color: polishOnSurfaceVariant,
+              fontSize: 12.5,
+              height: 1.5,
             ),
-            const SizedBox(height: 18.0),
-            SizedBox(
-              width: double.infinity,
-              height: 48.0,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: polishPrimary,
-                  foregroundColor: polishOnPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14.0),
-                  ),
-                  elevation: 0,
+          ),
+          const SizedBox(height: 18.0),
+          SizedBox(
+            width: double.infinity,
+            height: 48.0,
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: polishPrimary,
+                foregroundColor: polishOnPrimary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14.0),
                 ),
-                onPressed: () async {
-                  final url = Uri.parse(
-                    'https://github.com/s4rrar/link-scan/releases',
-                  );
-                  if (await canLaunchUrl(url)) {
-                    await launchUrl(url);
-                  } else {
-                    _showSnackBar('Could not launch URL');
-                  }
-                },
-                icon: const Icon(Icons.open_in_new, size: 20.0),
-                label: const Text(
-                  'Open Releases Page',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
+                elevation: 0,
+              ),
+              onPressed: () async {
+                final url = Uri.parse(
+                  'https://github.com/s4rrar/link-scan/releases',
+                );
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(url);
+                } else {
+                  _showSnackBar('Could not launch URL');
+                }
+              },
+              icon: const Icon(Icons.open_in_new, size: 20.0),
+              label: const Text(
+                'Open Releases Page',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildStepGuideCard() {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24.0),
-        side: BorderSide(color: polishOutline.withOpacity(0.4), width: 1.0),
-      ),
-      color: polishSurface,
-      elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Quick Setup Instructions',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: polishPrimary,
-                fontSize: 15.0,
-              ),
+    final isDark = AppThemeState.isDark;
+    return GlassContainer(
+      isDark: isDark,
+      primaryColor: polishPrimary,
+      borderRadius: AppStyles.radiusLarge,
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Quick Setup Instructions',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: polishPrimary,
+              fontSize: 15.0,
             ),
-            const SizedBox(height: 12.0),
-            _buildStepRow(
-              '1',
-              'Download / Start',
-              'Install LinkScanPC from GitHub releases on your computer.',
-            ),
-            const SizedBox(height: 12.0),
-            _buildStepRow(
-              '2',
-              'Connect to Local Wi-Fi',
-              'Ensure both your computer and your phone are connected to the exact same Wi-Fi SSID network.',
-            ),
-            const SizedBox(height: 12.0),
-            _buildStepRow(
-              '3',
-              'Configure IP & Port',
-              'Head to the Settings tab in this App. Enter your PC\'s Local IP address and Port (usually 8080), then press Test Connection.',
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 12.0),
+          _buildStepRow(
+            '1',
+            'Download / Start',
+            'Install LinkScanPC from GitHub releases on your computer.',
+          ),
+          const SizedBox(height: 12.0),
+          _buildStepRow(
+            '2',
+            'Connect to Local Wi-Fi',
+            'Ensure both your computer and your phone are connected to the exact same Wi-Fi SSID network.',
+          ),
+          const SizedBox(height: 12.0),
+          _buildStepRow(
+            '3',
+            'Configure IP & Port',
+            'Head to the Settings tab in this App. Enter your PC\'s Local IP address and Port (usually 8080), then press Test Connection.',
+          ),
+        ],
       ),
     );
   }

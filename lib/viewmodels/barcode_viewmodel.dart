@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/scan_item.dart';
 import '../database/db_helper.dart';
 import '../network/api_client.dart';
+import '../theme/app_styles.dart';
+import '../theme/app_theme.dart';
 
 enum ConnectionStatus { connected, failed, ready }
 
@@ -30,6 +32,12 @@ class BarcodeViewModel extends ChangeNotifier {
 
   bool _isDarkMode = false;
   bool get isDarkMode => _isDarkMode;
+
+  PrimaryColorOption _primaryColor = PrimaryColorOption.blue;
+  PrimaryColorOption get primaryColor => _primaryColor;
+
+  Color _customColor = const Color(0xFF10B981);
+  Color get customColor => _customColor;
 
   // Real-time Scanning Cooldown States
   bool _isCoolingDown = false;
@@ -79,6 +87,16 @@ class BarcodeViewModel extends ChangeNotifier {
     _soundEnabled = _prefs.getBool('sound_enabled') ?? true;
     _vibrationEnabled = _prefs.getBool('vibration_enabled') ?? true;
     _isDarkMode = _prefs.getBool('dark_mode_enabled') ?? false;
+
+    final colorName = _prefs.getString('primary_color_option') ?? 'Classic Blue';
+    _primaryColor = PrimaryColorOption.values.firstWhere(
+      (e) => e.name == colorName,
+      orElse: () => PrimaryColorOption.blue,
+    );
+
+    final customColorInt = _prefs.getInt('custom_color_value') ?? const Color(0xFF10B981).value;
+    _customColor = Color(customColorInt);
+    AppThemeState.customColorValue = _customColor;
 
     await refreshHistory();
     _startPeriodicPing();
@@ -150,6 +168,19 @@ class BarcodeViewModel extends ChangeNotifier {
   Future<void> updateDarkMode(bool enabled) async {
     _isDarkMode = enabled;
     await _prefs.setBool('dark_mode_enabled', enabled);
+    notifyListeners();
+  }
+
+  Future<void> updatePrimaryColor(PrimaryColorOption color) async {
+    _primaryColor = color;
+    await _prefs.setString('primary_color_option', color.name);
+    notifyListeners();
+  }
+
+  Future<void> updateCustomColor(Color color) async {
+    _customColor = color;
+    await _prefs.setInt('custom_color_value', color.value);
+    AppThemeState.customColorValue = color;
     notifyListeners();
   }
 
@@ -265,7 +296,7 @@ class BarcodeViewModel extends ChangeNotifier {
       HapticFeedback.lightImpact();
     }
     if (_soundEnabled) {
-      const MethodChannel('com.linkscan.pro/beep').invokeMethod('beep').catchError((e) {
+      const MethodChannel('com.linkscan.org/beep').invokeMethod('beep').catchError((e) {
         if (kDebugMode) {
           print("Error playing beep: $e");
         }

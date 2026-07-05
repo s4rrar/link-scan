@@ -32,7 +32,7 @@ subprojects {
                     pkg = matchResult.groupValues[1]
                 }
             }
-            android.namespace = pkg ?: ("com.linkscan.pro." + project.name.replace("-", "_").replace(" ", "_"))
+            android.namespace = pkg ?: ("com.linkscan.org." + project.name.replace("-", "_").replace(" ", "_"))
         }
     }
 }

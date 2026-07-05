@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'app_styles.dart';
 
 class AppThemeState {
   static bool isDark = false;
+  static PrimaryColorOption primaryColorOption = PrimaryColorOption.blue;
+  static Color customColorValue = const Color(0xFF10B981);
 }
 
 // Light theme constants
-const Color _lightPrimary = Color(0xFF0061A4);
 const Color _lightOnPrimary = Color(0xFFFFFFFF);
-const Color _lightPrimaryContainer = Color(0xFFD1E4FF);
-const Color _lightOnPrimaryContainer = Color(0xFF001D36);
 const Color _lightSecondary = Color(0xFF535F70);
 const Color _lightOnSecondary = Color(0xFFFFFFFF);
 const Color _lightSecondaryContainer = Color(0xFFD6E4F7);
@@ -26,10 +26,7 @@ const Color _lightOnError = Color(0xFFFFFFFF);
 const Color _lightSurfaceContainerLow = Color(0xFFF3F3FA);
 
 // Dark theme constants (harmonious dark mode palette)
-const Color _darkPrimary = Color(0xFF9ECAFF);
 const Color _darkOnPrimary = Color(0xFF003258);
-const Color _darkPrimaryContainer = Color(0xFF00497D);
-const Color _darkOnPrimaryContainer = Color(0xFFD1E4FF);
 const Color _darkSecondary = Color(0xFFBBC7DB);
 const Color _darkOnSecondary = Color(0xFF253140);
 const Color _darkSecondaryContainer = Color(0xFF3B4858);
@@ -46,10 +43,10 @@ const Color _darkOnError = Color(0xFF690005);
 const Color _darkSurfaceContainerLow = Color(0xFF0F1113);
 
 // Dynamic Getters for polish colors
-Color get polishPrimary => AppThemeState.isDark ? _darkPrimary : _lightPrimary;
+Color get polishPrimary => AppThemeState.isDark ? AppThemeState.primaryColorOption.darkPrimary : AppThemeState.primaryColorOption.lightPrimary;
 Color get polishOnPrimary => AppThemeState.isDark ? _darkOnPrimary : _lightOnPrimary;
-Color get polishPrimaryContainer => AppThemeState.isDark ? _darkPrimaryContainer : _lightPrimaryContainer;
-Color get polishOnPrimaryContainer => AppThemeState.isDark ? _darkOnPrimaryContainer : _lightOnPrimaryContainer;
+Color get polishPrimaryContainer => AppThemeState.isDark ? AppThemeState.primaryColorOption.darkPrimaryContainer : AppThemeState.primaryColorOption.lightPrimaryContainer;
+Color get polishOnPrimaryContainer => AppThemeState.isDark ? AppThemeState.primaryColorOption.darkOnPrimaryContainer : AppThemeState.primaryColorOption.lightOnPrimaryContainer;
 Color get polishSecondary => AppThemeState.isDark ? _darkSecondary : _lightSecondary;
 Color get polishOnSecondary => AppThemeState.isDark ? _darkOnSecondary : _lightOnSecondary;
 Color get polishSecondaryContainer => AppThemeState.isDark ? _darkSecondaryContainer : _lightSecondaryContainer;
@@ -65,14 +62,14 @@ Color get polishErrorContainer => AppThemeState.isDark ? _darkErrorContainer : _
 Color get polishOnError => AppThemeState.isDark ? _darkOnError : _lightOnError;
 Color get polishSurfaceContainerLow => AppThemeState.isDark ? _darkSurfaceContainerLow : _lightSurfaceContainerLow;
 
-final ThemeData appTheme = ThemeData(
+ThemeData get appTheme => ThemeData(
   useMaterial3: true,
-  colorScheme: const ColorScheme(
+  colorScheme: ColorScheme(
     brightness: Brightness.light,
-    primary: _lightPrimary,
+    primary: AppThemeState.primaryColorOption.lightPrimary,
     onPrimary: _lightOnPrimary,
-    primaryContainer: _lightPrimaryContainer,
-    onPrimaryContainer: _lightOnPrimaryContainer,
+    primaryContainer: AppThemeState.primaryColorOption.lightPrimaryContainer,
+    onPrimaryContainer: AppThemeState.primaryColorOption.lightOnPrimaryContainer,
     secondary: _lightSecondary,
     onSecondary: _lightOnSecondary,
     secondaryContainer: _lightSecondaryContainer,
@@ -89,16 +86,31 @@ final ThemeData appTheme = ThemeData(
   ),
   scaffoldBackgroundColor: _lightBackground,
   textTheme: GoogleFonts.publicSansTextTheme(),
+  navigationBarTheme: NavigationBarThemeData(
+    indicatorColor: AppThemeState.primaryColorOption.lightPrimary.withOpacity(0.15),
+    iconTheme: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
+        return IconThemeData(color: AppThemeState.primaryColorOption.lightPrimary);
+      }
+      return IconThemeData(color: _lightOnSurfaceVariant.withOpacity(0.8));
+    }),
+    labelTextStyle: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
+        return TextStyle(color: AppThemeState.primaryColorOption.lightPrimary, fontWeight: FontWeight.bold, fontSize: 12.0);
+      }
+      return TextStyle(color: _lightOnSurfaceVariant.withOpacity(0.8), fontSize: 12.0);
+    }),
+  ),
 );
 
-final ThemeData darkAppTheme = ThemeData(
+ThemeData get darkAppTheme => ThemeData(
   useMaterial3: true,
-  colorScheme: const ColorScheme(
+  colorScheme: ColorScheme(
     brightness: Brightness.dark,
-    primary: _darkPrimary,
+    primary: AppThemeState.primaryColorOption.darkPrimary,
     onPrimary: _darkOnPrimary,
-    primaryContainer: _darkPrimaryContainer,
-    onPrimaryContainer: _darkOnPrimaryContainer,
+    primaryContainer: AppThemeState.primaryColorOption.darkPrimaryContainer,
+    onPrimaryContainer: AppThemeState.primaryColorOption.darkOnPrimaryContainer,
     secondary: _darkSecondary,
     onSecondary: _darkOnSecondary,
     secondaryContainer: _darkSecondaryContainer,
@@ -115,5 +127,19 @@ final ThemeData darkAppTheme = ThemeData(
   ),
   scaffoldBackgroundColor: _darkBackground,
   textTheme: GoogleFonts.publicSansTextTheme(Typography.whiteMountainView),
+  navigationBarTheme: NavigationBarThemeData(
+    indicatorColor: AppThemeState.primaryColorOption.darkPrimary.withOpacity(0.20),
+    iconTheme: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
+        return IconThemeData(color: AppThemeState.primaryColorOption.darkPrimary);
+      }
+      return IconThemeData(color: _darkOnSurfaceVariant.withOpacity(0.8));
+    }),
+    labelTextStyle: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
+        return TextStyle(color: AppThemeState.primaryColorOption.darkPrimary, fontWeight: FontWeight.bold, fontSize: 12.0);
+      }
+      return TextStyle(color: _darkOnSurfaceVariant.withOpacity(0.8), fontSize: 12.0);
+    }),
+  ),
 );
-

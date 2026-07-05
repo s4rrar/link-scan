@@ -9,7 +9,7 @@ class CameraPermissionRequestScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: polishBackground,
+      color: Colors.transparent,
       padding: const EdgeInsets.all(24.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

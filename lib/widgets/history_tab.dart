@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_styles.dart';
 import '../viewmodels/barcode_viewmodel.dart';
 import 'history_item_card.dart';
 
@@ -24,29 +25,41 @@ class HistoryTab extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) {
-        return AlertDialog(
-          backgroundColor: polishSurface,
-          title: Text(
-            'Delete Whole History?',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0, color: polishOnSurface),
-          ),
-          content: Text(
-            'This action is permanent and will wipe all ${viewModel.scanHistory.length} locally stored barcode records.',
-            style: TextStyle(color: polishOnSurfaceVariant),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: Text('Cancel', style: TextStyle(color: polishOnSurfaceVariant)),
+        final isDark = viewModel.isDarkMode;
+        final primaryColor = polishPrimary;
+        return BackdropFilter(
+          filter: AppStyles.glassBlurFilter,
+          child: AlertDialog(
+            backgroundColor: (isDark ? Colors.black : Colors.white).withOpacity(0.85),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppStyles.radiusLarge),
+              side: BorderSide(
+                color: (isDark ? Colors.white : primaryColor).withOpacity(0.2),
+                width: 1.2,
+              ),
             ),
-            TextButton(
-              onPressed: () {
-                viewModel.clearHistory();
-                Navigator.of(ctx).pop();
-              },
-              child: Text('Delete All', style: TextStyle(color: polishError, fontWeight: FontWeight.bold)),
+            title: Text(
+              'Delete Whole History?',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0, color: polishOnSurface),
             ),
-          ],
+            content: Text(
+              'This action is permanent and will wipe all ${viewModel.scanHistory.length} locally stored barcode records.',
+              style: TextStyle(color: polishOnSurfaceVariant),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text('Cancel', style: TextStyle(color: polishOnSurfaceVariant)),
+              ),
+              TextButton(
+                onPressed: () {
+                  viewModel.clearHistory();
+                  Navigator.of(ctx).pop();
+                },
+                child: Text('Delete All', style: TextStyle(color: polishError, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
         );
       },
     );

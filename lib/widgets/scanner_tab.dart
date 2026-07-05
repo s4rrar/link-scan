@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_styles.dart';
 import '../viewmodels/barcode_viewmodel.dart';
 import 'camera_permission_request_screen.dart';
 import 'viewfinder_painter.dart';
@@ -229,13 +230,11 @@ class _ScannerTabState extends State<ScannerTab> with SingleTickerProviderStateM
                     Container(
                       color: Colors.black.withOpacity(0.4),
                       alignment: Alignment.center,
-                      child: Container(
+                      child: GlassContainer(
+                        isDark: viewModel.isDarkMode,
+                        primaryColor: polishError,
+                        borderRadius: AppStyles.radiusMedium,
                         padding: const EdgeInsets.all(24.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.95),
-                          borderRadius: BorderRadius.circular(16.0),
-                          border: Border.all(color: polishError.withOpacity(0.3), width: 1.0),
-                        ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -246,7 +245,7 @@ class _ScannerTabState extends State<ScannerTab> with SingleTickerProviderStateM
                                 value: viewModel.cooldownProgress,
                                 color: polishError,
                                 strokeWidth: 4.0,
-                                backgroundColor: Colors.grey.shade300,
+                                backgroundColor: (viewModel.isDarkMode ? Colors.white : Colors.black).withOpacity(0.1),
                               ),
                             ),
                             const SizedBox(height: 16.0),
@@ -280,75 +279,70 @@ class _ScannerTabState extends State<ScannerTab> with SingleTickerProviderStateM
 
           // Bottom card with details of last scanned item
           if (viewModel.lastScannedValue != null)
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24.0),
-                side: BorderSide(color: polishOutline.withOpacity(0.5), width: 1.0),
-              ),
-              color: polishSurface,
-              elevation: 0,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 48.0,
-                      height: 48.0,
-                      decoration: BoxDecoration(
-                        color: polishPrimaryContainer,
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      alignment: Alignment.center,
-                      child: Icon(
-                        Icons.qr_code,
-                        color: polishOnPrimaryContainer,
-                        size: 24.0,
-                      ),
+            GlassContainer(
+              isDark: viewModel.isDarkMode,
+              primaryColor: polishPrimary,
+              borderRadius: AppStyles.radiusLarge,
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  Container(
+                    width: 48.0,
+                    height: 48.0,
+                    decoration: BoxDecoration(
+                      color: polishPrimaryContainer,
+                      borderRadius: BorderRadius.circular(12.0),
                     ),
-                    const SizedBox(width: 16.0),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'LAST SCANNED • ${viewModel.lastScannedFormat ?? "FORMAT"}',
-                            style: TextStyle(
-                              color: polishPrimary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10.0,
-                              letterSpacing: 1.0,
-                            ),
-                          ),
-                          const SizedBox(height: 2.0),
-                          Text(
-                            viewModel.lastScannedValue ?? '',
-                            style: TextStyle(
-                              color: polishOnSurface,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16.0,
-                              fontFamily: 'monospace',
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4.0),
-                          Text(
-                            'Sent to companion in real-time',
-                            style: TextStyle(
-                              color: polishOnSurfaceVariant,
-                              fontSize: 12.0,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(
-                      Icons.check_circle,
-                      color: Color(0xFF2E7D32),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      Icons.qr_code,
+                      color: polishOnPrimaryContainer,
                       size: 24.0,
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 16.0),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'LAST SCANNED • ${viewModel.lastScannedFormat ?? "FORMAT"}',
+                          style: TextStyle(
+                            color: polishPrimary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10.0,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                        const SizedBox(height: 2.0),
+                        Text(
+                          viewModel.lastScannedValue ?? '',
+                          style: TextStyle(
+                            color: polishOnSurface,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.0,
+                            fontFamily: 'monospace',
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4.0),
+                        Text(
+                          'Sent to companion in real-time',
+                          style: TextStyle(
+                            color: polishOnSurfaceVariant,
+                            fontSize: 12.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(
+                    Icons.check_circle,
+                    color: Color(0xFF2E7D32),
+                    size: 24.0,
+                  ),
+                ],
               ),
             ),
         ],
