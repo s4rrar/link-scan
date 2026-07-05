@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dynamic_svg_logo.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_styles.dart';
@@ -55,10 +56,18 @@ class _MainScreenState extends State<MainScreen> {
         final isDark = widget.viewModel.isDarkMode;
         final primaryColor = polishPrimary;
 
-        return GlassBackground(
-          isDark: isDark,
-          primaryColor: primaryColor,
-          child: Scaffold(
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+            statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+            systemNavigationBarColor: Colors.transparent,
+            systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          ),
+          child: GlassBackground(
+            isDark: isDark,
+            primaryColor: primaryColor,
+            child: Scaffold(
             backgroundColor: Colors.transparent,
             appBar: PreferredSize(
               preferredSize: const Size.fromHeight(64.0),
@@ -175,8 +184,9 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
           ),
-        );
-      },
-    );
+        ),
+      );
+    },
+  );
   }
 }

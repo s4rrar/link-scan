@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_styles.dart';
 
@@ -64,6 +65,15 @@ Color get polishSurfaceContainerLow => AppThemeState.isDark ? _darkSurfaceContai
 
 ThemeData get appTheme => ThemeData(
   useMaterial3: true,
+  appBarTheme: const AppBarTheme(
+    systemOverlayStyle: SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ),
+  ),
   colorScheme: ColorScheme(
     brightness: Brightness.light,
     primary: AppThemeState.primaryColorOption.lightPrimary,
@@ -105,6 +115,15 @@ ThemeData get appTheme => ThemeData(
 
 ThemeData get darkAppTheme => ThemeData(
   useMaterial3: true,
+  appBarTheme: const AppBarTheme(
+    systemOverlayStyle: SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarIconBrightness: Brightness.light,
+    ),
+  ),
   colorScheme: ColorScheme(
     brightness: Brightness.dark,
     primary: AppThemeState.primaryColorOption.darkPrimary,

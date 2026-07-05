@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_svg/flutter_svg.dart';
+import '../theme/app_theme.dart';
 
 class DynamicSvgLogo extends StatelessWidget {
   final double width;
@@ -16,27 +17,31 @@ class DynamicSvgLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Always use the light theme version of the primary color for the logo to avoid bright/washed-out colors in dark theme
+    final resolvedColor = AppThemeState.primaryColorOption.lightPrimary;
+
     return FutureBuilder<String>(
       future: rootBundle.loadString('logo/logo.svg'),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-          final hexColor = '#${primaryColor.toARGB32().toRadixString(16).substring(2).padLeft(6, '0')}';
-          
-          final hsl = HSLColor.fromColor(primaryColor);
-          final lighterColor = hsl.withLightness((hsl.lightness + 0.12).clamp(0.0, 1.0)).toColor();
-          final hexLighterColor = '#${lighterColor.toARGB32().toRadixString(16).substring(2).padLeft(6, '0')}';
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.hasData) {
+          final hexColor =
+              '#${resolvedColor.toARGB32().toRadixString(16).substring(2).padLeft(6, '0')}';
+
+          final hsl = HSLColor.fromColor(resolvedColor);
+          final lighterColor = hsl
+              .withLightness((hsl.lightness + 0.12).clamp(0.0, 1.0))
+              .toColor();
+          final hexLighterColor =
+              '#${lighterColor.toARGB32().toRadixString(16).substring(2).padLeft(6, '0')}';
 
           String svgString = snapshot.data!;
           svgString = svgString.replaceAll('#0F9BFC', hexLighterColor);
           svgString = svgString.replaceAll('#0374E6', hexColor);
 
-          return SvgPicture.string(
-            svgString,
-            width: width,
-            height: height,
-          );
+          return SvgPicture.string(svgString, width: width, height: height);
         }
-        
+
         return SizedBox(
           width: width,
           height: height,
