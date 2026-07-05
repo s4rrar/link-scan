@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/scan_item.dart';
+import '../models/discovered_server.dart';
 import '../database/db_helper.dart';
 import '../network/api_client.dart';
 import '../theme/app_styles.dart';
@@ -63,6 +66,12 @@ class BarcodeViewModel extends ChangeNotifier {
 
   bool _isTestingConnection = false;
   bool get isTestingConnection => _isTestingConnection;
+
+  List<DiscoveredServer> _discoveredServers = [];
+  List<DiscoveredServer> get discoveredServers => _discoveredServers;
+
+  bool _isScanningUdp = false;
+  bool get isScanningUdp => _isScanningUdp;
 
   Timer? _pingTimer;
   Timer? _failureTimer;
@@ -216,6 +225,104 @@ class BarcodeViewModel extends ChangeNotifier {
       });
     } finally {
       _isTestingConnection = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> scanForServers() async {
+    _isScanningUdp = true;
+    _discoveredServers = [];
+    _connectionStatusMessage = 'Scanning local network for companion servers...';
+    notifyListeners();
+
+    RawDatagramSocket? socket;
+    try {
+      socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 0);
+      socket.broadcastEnabled = true;
+
+      // Prepare discovery packet
+      final data = utf8.encode('LINK_SCAN_DISCOVER');
+      
+      // 1. Send general broadcast
+      socket.send(data, InternetAddress('255.255.255.255'), 35912);
+
+      // 2. Send interface-specific broadcasts
+      try {
+        final interfaces = await NetworkInterface.list(
+          type: InternetAddressType.IPv4,
+          includeLinkLocal: false,
+          includeLoopback: false,
+        );
+        for (var interface in interfaces) {
+          for (var addr in interface.addresses) {
+            final parts = addr.address.split('.');
+            if (parts.length == 4) {
+              final broadcastIp = '${parts[0]}.${parts[1]}.${parts[2]}.255';
+              socket.send(data, InternetAddress(broadcastIp), 35912);
+            }
+          }
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error listing network interfaces: $e');
+        }
+      }
+
+      final Set<DiscoveredServer> found = {};
+      
+      // Listen for responses
+      final subscription = socket.listen((RawSocketEvent event) {
+        if (event == RawSocketEvent.read) {
+          final datagram = socket!.receive();
+          if (datagram != null) {
+            try {
+              final responseStr = utf8.decode(datagram.data);
+              final Map<String, dynamic> json = jsonDecode(responseStr);
+              final hostname = json['hostname'] as String? ?? 'Unknown PC';
+              final port = json['port'] as int? ?? 8080;
+              final running = json['running'] as bool? ?? false;
+              final ip = datagram.address.address;
+
+              found.add(DiscoveredServer(
+                ip: ip,
+                port: port,
+                hostname: hostname,
+                running: running,
+              ));
+            } catch (e) {
+              if (kDebugMode) {
+                print('Error parsing discovery response: $e');
+              }
+            }
+          }
+        }
+      });
+
+      // Wait for responses (1.5 seconds)
+      await Future.delayed(const Duration(milliseconds: 1500));
+      await subscription.cancel();
+
+      _discoveredServers = found.toList();
+
+      if (_discoveredServers.isEmpty) {
+        _connectionStatusMessage = 'No companion servers found on the local network.';
+      } else if (_discoveredServers.length == 1) {
+        final server = _discoveredServers.first;
+        _serverIp = server.ip;
+        _serverPort = server.port;
+        await _prefs.setString('server_ip', _serverIp);
+        await _prefs.setInt('server_port', _serverPort);
+        _connectionStatusMessage = 'Detected and connected to "${server.hostname}" (${server.ip}:${server.port})';
+        // Test connection
+        await testConnection();
+      } else {
+        _connectionStatusMessage = 'Discovered ${_discoveredServers.length} companion servers. Please select one below.';
+      }
+    } catch (e) {
+      _connectionStatusMessage = 'UDP scan failed: $e';
+    } finally {
+      socket?.close();
+      _isScanningUdp = false;
       notifyListeners();
     }
   }

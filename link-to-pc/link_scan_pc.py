@@ -65,7 +65,7 @@ DEFAULT_SETTINGS = {
     "prefix": "",
     "custom_suffix": "",
     "beep": True,
-    "show_notify": True,
+    "show_notify": False,
     "log_scans": True,
     "auto_start": True,
     "theme": "light",
@@ -1294,6 +1294,38 @@ def build_tray():
     return tray_icon
 
 
+# ── UDP Discovery Server ──────────────────────────────────────────────────────
+def start_udp_discovery():
+    def udp_loop():
+        udp_port = 35912
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            s.bind(("0.0.0.0", udp_port))
+            logging.info("UDP Discovery listening on port %d", udp_port)
+        except Exception as exc:
+            logging.error("UDP Discovery bind failed: %s", exc)
+            return
+
+        while True:
+            try:
+                data, addr = s.recvfrom(1024)
+                if data == b"LINK_SCAN_DISCOVER":
+                    hostname = socket.gethostname()
+                    res = {
+                        "hostname": hostname,
+                        "port": int(cfg.get("port", 8080)),
+                        "running": server_running
+                    }
+                    s.sendto(json.dumps(res).encode("utf-8"), addr)
+            except Exception as exc:
+                logging.warning("UDP Discovery loop exception: %s", exc)
+                time.sleep(1)
+
+    t = threading.Thread(target=udp_loop, daemon=True)
+    t.start()
+
+
 # ── Entry point ───────────────────────────────────────────────────────────────
 def main():
     global settings_win
@@ -1304,6 +1336,8 @@ def main():
     t = threading.Thread(target=tray.run, daemon=True)
     t.start()
 
+    start_udp_discovery()
+
     if cfg.get("auto_start"):
         srv_t = threading.Thread(target=start_server, daemon=True)
         srv_t.start()
@@ -1313,3 +1347,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
