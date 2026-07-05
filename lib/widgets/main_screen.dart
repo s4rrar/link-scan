@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dynamic_svg_logo.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_styles.dart';
 import '../viewmodels/barcode_viewmodel.dart';
@@ -72,17 +73,11 @@ class _MainScreenState extends State<MainScreen> {
                           Container(
                             width: 40.0,
                             height: 40.0,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                            ),
                             alignment: Alignment.center,
-                            child: ClipOval(
-                              child: Image.asset(
-                                'logo/logo.png',
-                                width: 40.0,
-                                height: 40.0,
-                                fit: BoxFit.cover,
-                              ),
+                            child: DynamicSvgLogo(
+                              width: 40.0,
+                              height: 40.0,
+                              primaryColor: primaryColor,
                             ),
                           ),
                           const SizedBox(width: 12.0),

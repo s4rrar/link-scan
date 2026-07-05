@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F9BFC"/>
+      <stop offset="100%" stop-color="#0374E6"/>
+    </linearGradient>
+    <mask id="glyphMask">
+      <rect x="0" y="0" width="1254" height="1254" fill="#ffffff"/>
+      <path d="M512 387 l0 21 l-39 1 l-38 0 l0 35 l0 36 l-21 0 l-21 0 l0 -58 l0 -57 l59 0 l60 0 l0 22 Z M860 424 l0 57 l-21 0 l-21 0 l0 -35 l0 -36 l-38 0 l-39 0 l0 -22 l0 -22 l59 0 l60 0 l0 58 Z M600 510 l0 68 l-68 0 l-67 0 l0 -68 l0 -69 l67 0 l68 0 l0 69 Z M788 510 l0 68 l-68 0 l-68 0 l0 -68 l0 -69 l68 0 l68 0 l0 69 Z M540 630 l60 0 l0 68 l0 69 l-68 0 l-67 0 l0 -69 l0 -68 l7 0 l8 0 l60 0 Z M686 648 l0 18 l17 0 l17 0 l0 -17 l0 -17 l17 0 l17 0 l0 16 l0 17 l-3 0 l-3 0 l-14 0 l-14 1 l0 16 l0 18 l-17 0 l-17 0 l0 -17 l0 -17 l-5 0 l-5 0 l-12 0 l-12 0 l0 -18 l0 -17 l17 0 l17 0 l0 17 Z M788 683 l0 17 l-17 0 l-17 0 l0 17 l0 17 l-17 0 l-17 0 l0 -17 l0 -17 l17 0 l17 0 l0 -16 l0 -16 l0 -1 l0 -1 l17 0 l17 0 l0 17 Z M686 717 l0 17 l-17 0 l-17 0 l0 -17 l0 -17 l17 0 l17 0 l0 17 Z M434 760 l0 36 l38 1 l38 0 l0 21 l0 21 l-58 0 l-59 0 l0 -57 l0 -58 l21 0 l20 0 l0 36 Z M859 783 l0 58 l-59 0 l-59 0 l0 -21 l-1 -22 l38 0 l38 0 l1 -37 l0 -36 l21 0 l20 1 l1 57 Z M786 735 l2 0 l0 17 l0 16 l-17 0 l-17 0 l0 -14 l0 -14 l1 -2 l0 -3 l13 0 l12 -1 l2 1 l2 0 l2 0 Z M720 752 l0 16 l-17 0 l-17 0 l0 -16 l0 -17 l17 0 l17 0 l0 17 Z M498 476 l0 2 l0 33 l0 33 l34 0 l33 0 l1 -1 l1 0 l0 -33 l0 -32 l-1 -2 l0 -1 l-34 0 l-33 0 l-1 1 Z M686 476 l0 2 l0 33 l0 33 l34 0 l34 0 l0 -34 l0 -35 l-34 0 l-33 0 l-1 1 Z M498 698 l0 34 l34 0 l34 0 l1 -34 l0 -34 l-35 0 l-34 0 l0 34 Z" fill="#000000"/>
+    </mask>
+  </defs>
+  <rect x="131" y="126" width="994" height="1004" rx="273" ry="273" fill="#ffffff"/>
+  <rect x="131" y="126" width="994" height="1004" rx="273" ry="273" fill="url(#bgGradient)" mask="url(#glyphMask)"/>
+</svg>
