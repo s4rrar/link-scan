@@ -52,3 +52,4 @@ link-to-pc/LinkScanPc.spec
 
 upload-keystore.jks
 
+__pycache__
