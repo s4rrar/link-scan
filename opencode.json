@@ -1,0 +1,13 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["AGENTS.md"],
+  "skills": {
+    "paths": ["skills"]
+  },
+  "references": {
+    "docs": {
+      "path": ".",
+      "description": "Use for project structure, Flutter/Dart conventions, and existing code patterns in this link-scan app"
+    }
+  }
+}
