@@ -1,4 +1,4 @@
-# LinkScan Pro (v1.0.0)
+# LinkScan Pro (v1.0.1)
 
 LinkScan Pro turns your mobile device into a high-speed, wireless hardware barcode scanner. Using local network connectivity, it pipes barcode and QR code transmissions directly to your cursor focus on any PC or laptop running our friction-free companion server.
 

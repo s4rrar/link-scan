@@ -70,7 +70,7 @@ class AboutTab extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'v1.0.0',
+                      'v1.0.1',
                       style: TextStyle(
                         color: polishOnPrimaryContainer,
                         fontSize: 12.0,
